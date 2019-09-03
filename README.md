@@ -1,2 +1,2 @@
 # Hopfield_Nets
-This is the implementation of continuous Hopfield network
+This is the implementation of Hopfield network
