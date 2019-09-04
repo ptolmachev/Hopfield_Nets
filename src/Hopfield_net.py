@@ -21,7 +21,7 @@ class Hopfield_network():
         R = (Y+Y.T)/2
         R[np.arange(num_neurons),np.arange(num_neurons)] = np.zeros(num_neurons)
         self.weights = (1/self.num_neurons)*R
-        self.hidden_state = 100*np.random.rand(num_neurons)-50
+        self.hidden_state = np.random.rand(num_neurons)-0.5
         self.state = np.sign(self.hidden_state)
 
     def update_state(self, sync=True):
@@ -44,11 +44,14 @@ class Hopfield_network():
             Y[np.arange(self.num_neurons),np.arange(self.num_neurons)] = np.zeros(self.num_neurons)
             self.weights = (1/self.num_neurons)*np.dot(patterns.T, patterns)
         elif rule =='Storkey':
+            # self.weights = np.zeros((self.num_neurons, self.num_neurons))
             for i in range(patterns.shape[0]):
-                h = (np.dot(self.weights, self.state.reshape(-1,1)).T).flatten() - (np.diag(self.weights)*self.state)
-                H = np.hstack([h.reshape(-1,1) for j in range(self.num_neurons)]) - self.weights*self.state
-                self.weights += (1/self.num_neurons)*\
-                                (np.dot(patterns[i].reshape(-1,1),patterns[i].reshape(1,-1)) - (H*patterns[i]) - (H*patterns[i]).T)
+                pattern = patterns[i]
+                h = (np.dot(self.weights, pattern.reshape(-1,1)).T).flatten() - (np.diag(self.weights)*pattern)
+                H = np.hstack([h.reshape(-1,1) for j in range(self.num_neurons)]) - self.weights*pattern
+                pattern_matrix = np.hstack([pattern.reshape(-1,1) for j in range(self.num_neurons)])
+                Z = pattern_matrix - H
+                self.weights += (1/self.num_neurons)*(Z*Z.T)
         return None
 
     def set_weights(self, new_weights):
@@ -110,14 +113,14 @@ class Continuous_HN(Hopfield_network):
 
 if __name__ == '__main__':
     num_neurons = 100
-    num_patterns = 10
+    num_patterns = 12
     sync = False
     flips = 25
-    # HN = Hopfield_network(num_neurons=num_neurons, p=0.5)
-    HN = Continuous_HN(num_neurons=num_neurons, T=0.000001, alpha=1, p=0.5)
-    # HN = Boltzmann_machine(num_neurons=num_neurons,T_max=0.2, T_decay=0.99, p=0.5)
+    HN = Hopfield_network(num_neurons=num_neurons, p=0.5)
+    # HN = Continuous_HN(num_neurons=num_neurons, T=0.000001, alpha=1, p=0.5)
+    # HN = Boltzmann_machine(num_neurons=num_neurons,T_max=0.1, T_decay=0.99, p=0.5)
     patterns = [random_state(0.5, num_neurons) for i in range(num_patterns)]
-    HN.learn_patterns(patterns, rule='Hebb')
+    HN.learn_patterns(patterns, rule='Storkey')
 
     pattern_r = introduce_random_flips(patterns[0], flips)
 
