@@ -1,7 +1,8 @@
 import numpy as np
 from copy import deepcopy
-def random_activity(p):
-    return np.random.choice([-1, 1], 1, [1 - p, p])[0]
+
+def random_state(p, n):
+    return np.array([np.random.choice([-1, 1], 1, [1 - p, p])[0] for i in range(n)])
 
 def introduce_random_flips(pattern, k):
     new_pattern = deepcopy(pattern)
@@ -13,7 +14,6 @@ def introduce_random_flips(pattern, k):
 def sigmoid(x,T):
     return 1.0/(1 + np.exp(-x/T))
 
-
 class Hopfield_network():
     def __init__(self, num_neurons, p):
         self.num_neurons = num_neurons
@@ -21,26 +21,34 @@ class Hopfield_network():
         R = (Y+Y.T)/2
         R[np.arange(num_neurons),np.arange(num_neurons)] = np.zeros(num_neurons)
         self.weights = (1/self.num_neurons)*R
-        self.biases = np.zeros(num_neurons)
-        self.state = np.array([random_activity(p) for i in range(self.num_neurons)]).reshape(1,-1)
+        self.hidden_state = 100*np.random.rand(num_neurons)-50
+        self.state = np.sign(self.hidden_state)
 
     def update_state(self, sync=True):
         if sync == True:
-            h = (np.dot(self.weights,self.state.reshape(-1,1)).T + self.biases).flatten()
-            self.state = np.sign(h)
+            self.hidden_state = (np.dot(self.weights,self.state.reshape(-1,1))).flatten()
+            self.state = np.sign(self.hidden_state)
         elif sync == False:
             for i in range(num_neurons):
-                h_i = np.dot(self.weights[i,:], self.state)
-                self.state[i] = np.sign(h_i)
+                self.hidden_state[i] = np.dot(self.weights[i,:], self.state)
+                self.state[i] = np.sign(self.hidden_state[i])
         else:
             raise AttributeError('sync variable can take only boolean values')
         return None
 
-    def learn_patterns(self, patterns):
-        patterns = np.array(patterns)
-        Y = np.dot(patterns.T, patterns)
-        Y[np.arange(self.num_neurons),np.arange(self.num_neurons)] = np.zeros(self.num_neurons)
-        self.weights = (1/self.num_neurons)*np.dot(patterns.T, patterns)
+    def learn_patterns(self, patterns, rule='Hebb'):
+        patterns = np.array(patterns).squeeze()
+        if rule == 'Hebb':
+            Y = np.dot(patterns.T, patterns)
+            # deprecate self-connectivity
+            Y[np.arange(self.num_neurons),np.arange(self.num_neurons)] = np.zeros(self.num_neurons)
+            self.weights = (1/self.num_neurons)*np.dot(patterns.T, patterns)
+        elif rule =='Storkey':
+            for i in range(patterns.shape[0]):
+                h = (np.dot(self.weights, self.state.reshape(-1,1)).T).flatten() - (np.diag(self.weights)*self.state)
+                H = np.hstack([h.reshape(-1,1) for j in range(self.num_neurons)]) - self.weights*self.state
+                self.weights += (1/self.num_neurons)*\
+                                (np.dot(patterns[i].reshape(-1,1),patterns[i].reshape(1,-1)) - (H*patterns[i]) - (H*patterns[i]).T)
         return None
 
     def set_weights(self, new_weights):
@@ -64,12 +72,13 @@ class Boltzmann_machine(Hopfield_network):
 
     def update_state(self, sync=True):
         if sync == True:
-            h = (np.dot(self.weights, self.state.reshape(-1, 1)).T + self.biases).flatten()
-            self.state = np.array([(1 if np.random.rand() < h[i] else -1) for i in range(len(h))])
+            self.hidden_state = (np.dot(self.weights,self.state.reshape(-1,1))).flatten()
+            h_tmp = sigmoid(self.hidden_state, self.T)
+            self.state = np.array([(1 if np.random.rand() < h_tmp[i] else -1) for i in range(len(h_tmp))])
         elif sync == False:
             for i in range(num_neurons):
-                h_i = np.dot(self.weights[i,:], self.state)
-                self.state[i] = 1 if np.random.rand() < h_i else -1
+                self.hidden_state[i] = np.dot(self.weights[i,:], self.state)
+                self.state[i] = 1 if np.random.rand() < sigmoid(self.hidden_state[i], self.T) else -1
         else:
             raise AttributeError('sync variable can take only boolean values')
         return None
@@ -82,25 +91,41 @@ class Boltzmann_machine(Hopfield_network):
             self.T *= self.T_decay
         return self.state
 
+
+class Continuous_HN(Hopfield_network):
+    def __init__(self, num_neurons, T,alpha, p):
+        super().__init__(num_neurons, p)
+        self.T = T
+        self.alpha = alpha
+
+    def update_state(self, sync=True):
+        if sync == True:
+            self.hidden_state = (np.dot(self.weights,self.state.reshape(-1,1))).flatten()
+            self.state = sigmoid(-(1-self.alpha) * self.state + self.hidden_state, self.T)
+        else:
+            for i in range(self.num_neurons):
+                self.hidden_state[i] = np.dot(self.weights[i,:], self.state)
+                self.state[i] = sigmoid(-(1 - self.alpha) * self.state[i] + self.hidden_state[i], self.T)
+        return None
+
 if __name__ == '__main__':
     num_neurons = 100
+    num_patterns = 10
     sync = False
-    HN = Hopfield_network(num_neurons=num_neurons, p=0.5)
-    # HN = Boltzmann_machine(num_neurons=num_neurons,T_max=10, T_decay=0.99, p=0.5)
-    pattern1 = np.array([(-1)**i for i in range(num_neurons)])
-    pattern2 = np.hstack([((-1)**i)*np.ones(num_neurons//50) for i in range(50)])
-    pattern3 = np.hstack([-1.0*np.ones(num_neurons//2),np.ones(num_neurons//2)])
-    HN.learn_patterns([pattern1, pattern2, pattern3])
+    flips = 25
+    # HN = Hopfield_network(num_neurons=num_neurons, p=0.5)
+    HN = Continuous_HN(num_neurons=num_neurons, T=0.000001, alpha=1, p=0.5)
+    # HN = Boltzmann_machine(num_neurons=num_neurons,T_max=0.2, T_decay=0.99, p=0.5)
+    patterns = [random_state(0.5, num_neurons) for i in range(num_patterns)]
+    HN.learn_patterns(patterns, rule='Hebb')
 
-    pattern_r = introduce_random_flips(pattern1, 10)
+    pattern_r = introduce_random_flips(patterns[0], flips)
 
     print('Similarity with different patterns (before): ')
-    print(np.linalg.norm(pattern_r - pattern1, 2))
-    print(np.linalg.norm(pattern_r - pattern2, 2))
-    print(np.linalg.norm(pattern_r - pattern3, 2))
+    for i in range(len(patterns)):
+        print(np.linalg.norm(pattern_r - patterns[i], 2))
 
-    retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, 100)
+    retrieved_pattern = np.sign(HN.retrieve_pattern(pattern_r, sync, 1000))
     print('Similarity with different patterns (after): ')
-    print(np.linalg.norm(retrieved_pattern - pattern1, 2))
-    print(np.linalg.norm(retrieved_pattern - pattern2, 2))
-    print(np.linalg.norm(retrieved_pattern - pattern3, 2))
+    for i in range(len(patterns)):
+        print(np.linalg.norm(retrieved_pattern - patterns[i], 2))
