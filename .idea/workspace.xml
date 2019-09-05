@@ -97,8 +97,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/Hopfield_net.py</url>
-          <line>52</line>
-          <option name="timeStamp" value="33" />
+          <line>56</line>
+          <option name="timeStamp" value="34" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
