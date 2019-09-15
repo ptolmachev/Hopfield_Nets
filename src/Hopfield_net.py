@@ -3,7 +3,7 @@ from copy import deepcopy
 from matplotlib import pyplot as plt
 
 def random_state(p, n):
-    return np.array([np.random.choice([-1, 1], 1, [1 - p, p])[0] for i in range(n)])
+    return np.array([np.sign(np.random.rand()-p) for i in range(n)])
 
 def random_state_(p, n):
     return np.array([np.random.choice([-0.9999, 0.9999], 1, [1 - p, p])[0] for i in range(n)])
@@ -19,7 +19,7 @@ def sigmoid(x):
     return 1.0 / (1 + np.exp(-x))
 
 class Hopfield_network():
-    def __init__(self, num_neurons, p):
+    def __init__(self, num_neurons):
         self.num_neurons = num_neurons
         Y = np.random.randn(self.num_neurons,self.num_neurons)
         R = (Y + Y.T) / 2
@@ -34,7 +34,7 @@ class Hopfield_network():
             self.hidden_state = np.matmul(self.weights, self.state) + self.biases
             self.state = np.sign(self.hidden_state)
         elif sync == False:
-            for i in range(num_neurons):
+            for i in range(self.num_neurons):
                 self.hidden_state[i] = np.dot(self.weights[i, :], self.state) + self.biases[i]
                 self.state[i] = np.sign(self.hidden_state[i])
         else:
@@ -78,8 +78,8 @@ class Hopfield_network():
         self.weights = new_weights
         return None
 
-    def retrieve_pattern(self, new_state, sync, time, record = False):
-        self.state = new_state
+    def retrieve_pattern(self, initial_state, sync, time, record = False):
+        self.state = deepcopy(initial_state)
         t = 0
         if record == True:
             data = dict()
@@ -99,8 +99,8 @@ class Hopfield_network():
             return self.state
 
 class Boltzmann_machine(Hopfield_network):
-    def __init__(self, num_neurons, T_max, T_decay, p):
-        super().__init__(num_neurons, p)
+    def __init__(self, num_neurons, T_max, T_decay):
+        super().__init__(num_neurons)
         self.T = T_max
         self.T_max = T_max
         self.T_decay = T_decay
@@ -138,10 +138,9 @@ class Boltzmann_machine(Hopfield_network):
         else:
             return self.state
 
-
 class Continuous_HN_DS(Hopfield_network):
-    def __init__(self, num_neurons, dt, p):
-        super().__init__(num_neurons, p)
+    def __init__(self, num_neurons, dt):
+        super().__init__(num_neurons)
         self.dt = dt
         self.fr = (self.state + 1)/2
 
@@ -157,8 +156,8 @@ class Continuous_HN_DS(Hopfield_network):
         return None
 
 class Continuous_HN(Hopfield_network):
-    def __init__(self, num_neurons, slope, dt, p):
-        super().__init__(num_neurons, p)
+    def __init__(self, num_neurons, slope, dt):
+        super().__init__(num_neurons)
         self.slope = slope
         self.dt = dt
         self.fr = (self.state + 1)/2
@@ -175,8 +174,8 @@ class Continuous_HN(Hopfield_network):
         return None
 
 class Continuous_HN_DS_ad(Continuous_HN_DS):
-    def __init__(self, num_neurons, dt, a, b, p):
-        super().__init__(num_neurons, dt, p)
+    def __init__(self, num_neurons, dt, a, b):
+        super().__init__(num_neurons, dt)
         self.u = np.zeros(self.num_neurons)
         self.a = a
         self.b = b
@@ -195,8 +194,8 @@ class Continuous_HN_DS_ad(Continuous_HN_DS):
         return None
 
 class Continuous_HN_ad(Continuous_HN):
-    def __init__(self, num_neurons, slope, dt, a, b, p):
-        super().__init__(num_neurons, slope, dt, p)
+    def __init__(self, num_neurons, slope, dt, a, b):
+        super().__init__(num_neurons, slope, dt)
         self.u = np.zeros(self.num_neurons)
         self.a = a
         self.b = b
@@ -223,8 +222,8 @@ if __name__ == '__main__':
     time = 5000
     # HN = Hopfield_network(num_neurons=num_neurons, p=0.5)
     # HN = Boltzmann_machine(num_neurons=num_neurons,T_max=0.1, T_decay=0.99, p=0.5)
-    # HN = Continuous_HN(num_neurons=num_neurons, T=0.3, alpha=0.1, p=0.5)
-    HN = Continuous_HN_adaptive(num_neurons=num_neurons, slope=3, alpha=0.1, beta = 0.000001, p=0.5)
+    # HN = Continuous_HN(num_neurons=num_neurons, T=0.3, dt=0.1, p=0.5)
+    HN = Continuous_HN_ad(num_neurons=num_neurons, slope=3, dt=0.1, a=0.0000001, b=1, p=0.5)
     patterns = [random_state_(0.5, num_neurons) for i in range(num_patterns)]
     HN.learn_patterns(patterns, rule=rule)
 

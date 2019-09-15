@@ -2,10 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ec45b697-f000-44d6-ab12-6303a128ad24" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/simulations.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/visualisation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Hopfield_net.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield_net.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/experiments.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flips_and_patterns_Hebb_100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flips_and_patterns_Hebb_sc_100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flips_and_patterns_pseudoinverse_100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flips_and_patterns_pseudoinverse_sc_100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/imgs/flips_and_patterns_Hebb_100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/imgs/flips_and_patterns_Hebb_sc_100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/imgs/flips_and_patterns_pseudoinverse_100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/imgs/flips_and_patterns_pseudoinverse_sc_100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulations.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -42,7 +50,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.simulations">
+  <component name="RunManager" selected="Python.visualisation">
     <configuration name="Hopfield_net" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Hopfield_Nets" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -106,8 +114,30 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="visualisation" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Hopfield_Nets" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/visualisation.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.visualisation" />
         <item itemvalue="Python.simulations" />
         <item itemvalue="Python.experiments" />
         <item itemvalue="Python.Hopfield_net" />
@@ -160,13 +190,38 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/simulations.py</url>
-          <line>15</line>
+          <line>16</line>
           <option name="timeStamp" value="65" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/simulations.py</url>
-          <line>23</line>
+          <line>24</line>
           <option name="timeStamp" value="66" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/simulations.py</url>
+          <line>35</line>
+          <option name="timeStamp" value="67" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/visualisation.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="70" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/visualisation.py</url>
+          <line>41</line>
+          <option name="timeStamp" value="71" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/Hopfield_net.py</url>
+          <line>5</line>
+          <option name="timeStamp" value="72" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/visualisation.py</url>
+          <line>34</line>
+          <option name="timeStamp" value="73" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
