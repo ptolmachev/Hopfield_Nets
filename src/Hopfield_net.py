@@ -41,34 +41,75 @@ class Hopfield_network():
             raise AttributeError('sync variable can take only boolean values')
         return None
 
-    def learn_patterns(self, patterns, rule='Hebb', sc = True):
-        patterns = np.array(patterns).squeeze()
-        if rule == 'Hebb':
-            Z = patterns.T.reshape(self.num_neurons,-1)
-            Y = np.dot(Z, Z.T)
-            self.weights = (1 / self.num_neurons) * Y
+    def learn_patterns(self, patterns, rule='Hebb', incremental = False, sc = True):
+        patterns = np.array(patterns).reshape(-1,len(patterns[0]))
 
-        elif rule =='Storkey':
-            #only incremental version
-            for i in range(patterns.shape[0]):
-                pattern = patterns[i]
-                h = np.matmul(self.weights, pattern) - (np.diag(self.weights)*pattern) + self.biases
-                H = np.hstack([h.reshape(-1,1) for j in range(self.num_neurons)]) - self.weights*pattern
-                pattern_matrix = np.hstack([pattern.reshape(-1,1) for j in range(self.num_neurons)])
-                Z = pattern_matrix - H
-                self.weights += (1 / self.num_neurons) * (Z * Z.T)
+        if rule == 'Hebb':
+            if incremental:
+                raise AttributeError('The is no separate incremental implementation of Hebb\'s learning rule since it is'
+                                     ' no different from the nonincremental one in terms of the end result')
+            else:
+                Z = patterns.T.reshape(self.num_neurons,-1)
+                Y = np.dot(Z, Z.T)
+                self.weights = (1 / self.num_neurons) * Y
 
         elif rule == 'pseudoinverse':
-            Z = patterns.T.reshape(self.num_neurons,-1)
-            Y = np.matmul(Z, np.linalg.pinv(Z))
-            self.weights = Y
+            if incremental == True:
+                raise AttributeError('The pseudoiverse learning rule can\'t be incremental')
+            else:
+                Z = patterns.T.reshape(self.num_neurons,-1)
+                Y = np.matmul(Z, np.linalg.pinv(Z))
+                self.weights = Y
 
-        elif rule == 'experimental':
-            Z = patterns.T
-            Y = np.matmul(np.arctanh(Z) / self.slope - np.hstack([self.biases.reshape(-1,1) for i in range(Z.shape[1])]), np.linalg.pinv(Z))
-            self.weights = Y
+        elif rule =='Storkey2ndOrder':
+            if incremental == True:
+                for i in range(patterns.shape[0]):
+                    pattern = patterns[i]
+                    h = np.matmul(self.weights, pattern) - (np.diag(self.weights)*pattern) + self.biases
+                    H = np.hstack([h.reshape(-1,1) for j in range(self.num_neurons)]) - self.weights*pattern
+                    pattern_matrix = np.hstack([pattern.reshape(-1,1) for j in range(self.num_neurons)])
+                    Z = pattern_matrix - H
+                    self.weights += (1 / self.num_neurons) * (Z * Z.T)
+            else:
+                raise(NotImplementedError)
+
+        elif rule == 'StorkeySimplified':
+            if incremental == True:
+                for i in range(patterns.shape[0]):
+                    pattern = patterns[i]
+                    h = np.matmul(self.weights, pattern) - (np.diag(self.weights)*pattern) + self.biases
+                    self.weights += (1 / self.num_neurons) * np.matmul( (pattern - h).reshape(-1,1),(pattern - h).reshape(1,-1))
+            else:
+                Z = patterns.T.reshape(self.num_neurons,-1)
+                H = np.matmul(self.weights, Z) + np.hstack([self.biases.reshape(-1,1) for i in range(Z.shape[-1])])
+                Y = np.dot( (Z - H), (Z - H).T)
+                self.weights += (1 / self.num_neurons) * Y
+
+        elif rule == 'StorkeyAsymm':
+            if incremental == True:
+                for i in range(patterns.shape[0]):
+                    pattern = patterns[i]
+                    h = np.matmul(self.weights, pattern) - (np.diag(self.weights)*pattern) + self.biases
+                    H = np.hstack([h.reshape(-1,1) for j in range(self.num_neurons)]) - self.weights*pattern
+                    pattern_matrix = np.hstack([pattern.reshape(-1,1) for j in range(self.num_neurons)])
+                    Z = pattern_matrix - H
+                    self.weights += (1 / self.num_neurons) * (pattern_matrix * Z.T)
+            else:
+                Z = patterns.T.reshape(self.num_neurons,-1)
+                H = np.matmul(self.weights, Z) + np.hstack([self.biases.reshape(-1,1) for i in range(Z.shape[-1])])
+                self.weights += (1 / self.num_neurons) * np.matmul(Z, (Z - H).T)
+
+        elif rule =='StorkeyOriginal':
+            if incremental == True:
+                for i in range(patterns.shape[0]):
+                    pattern = patterns[i]
+                    A = (1 / (self.num_neurons))*(np.matmul(pattern.reshape(-1,1),pattern.reshape(1,-1)) - np.identity(self.num_neurons))
+                    self.weights += A - np.matmul(A, self.weights) - np.matmul(self.weights, A)
+            else:
+                raise(NotImplementedError)
+
         else:
-            raise ValueError('the parameter rule can only take values \'Hebb\' or \'Storkey\'')
+            raise ValueError('the parameter rule can only take values: \'Hebb\', \'Storkey\', \'pseudoinverse\'')
 
         if sc == False:
             self.weights[np.arange(self.num_neurons), np.arange(self.num_neurons)] = np.zeros(self.num_neurons)
@@ -217,15 +258,15 @@ if __name__ == '__main__':
     num_neurons = 150
     num_patterns = 20
     sync = True
-    rule = 'Storkey' #'Storkey'
+    rule = 'StorkeyAssym2'
     flips = 40
-    time = 5000
-    # HN = Hopfield_network(num_neurons=num_neurons, p=0.5)
-    # HN = Boltzmann_machine(num_neurons=num_neurons,T_max=0.1, T_decay=0.99, p=0.5)
-    # HN = Continuous_HN(num_neurons=num_neurons, T=0.3, dt=0.1, p=0.5)
-    HN = Continuous_HN_ad(num_neurons=num_neurons, slope=3, dt=0.1, a=0.0000001, b=1, p=0.5)
+    time = 50
+    HN = Hopfield_network(num_neurons=num_neurons)
+    # HN = Boltzmann_machine(num_neurons=num_neurons,T_max=0.1, T_decay=0.99)
+    # HN = Continuous_HN(num_neurons=num_neurons, T=0.3, dt=0.1)
+    # HN = Continuous_HN_ad(num_neurons=num_neurons, slope=3, dt=0.1, a=0.0000001, b=1)
     patterns = [random_state_(0.5, num_neurons) for i in range(num_patterns)]
-    HN.learn_patterns(patterns, rule=rule)
+    HN.learn_patterns(patterns, rule=rule, incremental=True)
 
     pattern_r = introduce_random_flips(patterns[0], flips)
 

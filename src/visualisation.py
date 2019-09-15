@@ -6,6 +6,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib.gridspec as gridspec
 from copy import deepcopy
+import pickle
+import pandas as pd
 
 
 def visualise_patterns(patterns, initial_state, retrieved_pattern):
@@ -31,7 +33,7 @@ def visualise_patterns(patterns, initial_state, retrieved_pattern):
     plt.show()
 
 
-def run_visualisation(rule = 'pseudoinverse', flips = 10, sync = False, time = 50, random_patterns = False):
+def run_visualisation(rule = 'pseudoinverse', incremental = False, flips = 10, sync = False, time = 50, random_patterns = False):
     n = 10
     num_neurons = n**2
     HN = Hopfield_network(num_neurons=num_neurons)
@@ -61,11 +63,33 @@ def run_visualisation(rule = 'pseudoinverse', flips = 10, sync = False, time = 5
         patterns[2] = letter_T.flatten()
         patterns[3] = letter_E.flatten()
 
-    HN.learn_patterns(patterns, rule=rule)
+    HN.learn_patterns(patterns, rule=rule, incremental=incremental)
     pattern_r = introduce_random_flips(patterns[0], flips)
     retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, time, record=False)
     visualise_patterns(patterns, pattern_r, retrieved_pattern)
     return None
 
-# if __name__ == '__main__':
-#     run_visualisation(rule='pseudoinverse', flips=10, sync=True, time=50, random_patterns = False)
+
+def flips_and_patterns_contour_plot(file_name):
+    results = pickle.load(open(file_name, 'rb+'))
+    sc = True if '_sc_' in file_name else False
+    rule = file_name.split('.pkl')[0].split('_')[-3 if sc else -2]
+    # results = (results[:, :results.shape[1] // 2, :] - results[:, results.shape[1] // 2:, :][:, ::-1, :]) / 2
+    avg = pd.DataFrame(np.mean(results, axis=-1)).fillna(0)
+
+    fig, axs = plt.subplots(1, 1)
+    cs = axs.contourf(avg, levels=np.linspace(-1., 1.0, 41), cmap='coolwarm', extend='both', linestyles='solid')
+    axs.contour(avg, levels=np.linspace(-1, 1, 41), colors='k', linestyles='dashed', linewidths=0.25)
+    axs.set_xlabel('Number of flips in the initial state', fontsize=24)
+    axs.set_ylabel('Number of memorised patterns', fontsize=24)
+    axs.set_xticklabels(20*np.arange(5), fontsize=16)
+    axs.set_yticklabels(20*np.arange(5), fontsize=16)
+    axs.set_title(
+        f'The dependence of overlap between the true and retrieved states on flips \n in initial conditions and number of stored patterns (rule = {rule}, sc = {sc})',
+        fontsize=24)
+    fig.colorbar(cs)
+    plt.show()
+    fig.savefig('../imgs/' + file_name.split('.pkl')[0].split('/')[-1] + '.png')
+
+if __name__ == '__main__':
+    flips_and_patterns_contour_plot('../data/flips_and_patterns_StorkeyAsymm_100.pkl')

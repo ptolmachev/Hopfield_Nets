@@ -2,10 +2,6 @@ from src.Hopfield_net import *
 import numpy as np
 from matplotlib import pyplot as plt
 
-def pseudo_sum(Z):
-    return np.hstack([np.sum(Z, axis=1).reshape(-1,1) for i in range(Z.shape[-1])]) - Z
-
-
 
 class Continuous_HN_oscillatory(Hopfield_network):
     def __init__(self, num_neurons, T, alpha, beta, p):
