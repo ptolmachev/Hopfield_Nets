@@ -6,13 +6,13 @@ from matplotlib import pyplot as plt
 
 from src.visualisation import flips_and_patterns_contour_plot
 
-num_neurons = 100
-num_of_flips = 100
-num_of_patterns = 100
+num_neurons = 40
+num_of_flips = 40
+num_of_patterns = 40
 num_repetitions = 10
 sync = True
 time = 50
-rule = 'StorkeyAsymm'
+rule = 'Optimised'
 sc = True
 incremental = True
 sc_or_not = '' if sc == False else '_sc'

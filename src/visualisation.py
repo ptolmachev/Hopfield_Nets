@@ -82,8 +82,8 @@ def flips_and_patterns_contour_plot(file_name):
     axs.contour(avg, levels=np.linspace(-1, 1, 41), colors='k', linestyles='dashed', linewidths=0.25)
     axs.set_xlabel('Number of flips in the initial state', fontsize=24)
     axs.set_ylabel('Number of memorised patterns', fontsize=24)
-    axs.set_xticklabels(20*np.arange(5), fontsize=16)
-    axs.set_yticklabels(20*np.arange(5), fontsize=16)
+    # axs.set_xticklabels(20*np.arange(5), fontsize=16)
+    # axs.set_yticklabels(20*np.arange(5), fontsize=16)
     axs.set_title(
         f'The dependence of overlap between the true and retrieved states on flips \n in initial conditions and number of stored patterns (rule = {rule}, sc = {sc})',
         fontsize=24)

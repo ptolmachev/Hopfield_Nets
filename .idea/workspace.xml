@@ -2,19 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ec45b697-f000-44d6-ab12-6303a128ad24" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/experiments_discrete_states.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/learning_rules.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.xdp_pattern_retrieval.VICT7Z" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgs/flips_and_patterns_Hebb_100.png" beforeDir="false" afterPath="$PROJECT_DIR$/imgs/flips_and_patterns_Hebb_100.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgs/flips_and_patterns_Hebb_sc_100.png" beforeDir="false" afterPath="$PROJECT_DIR$/imgs/flips_and_patterns_Hebb_sc_100.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgs/flips_and_patterns_pseudoinverse_100.png" beforeDir="false" afterPath="$PROJECT_DIR$/imgs/flips_and_patterns_pseudoinverse_100.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgs/flips_and_patterns_pseudoinverse_sc_100.png" beforeDir="false" afterPath="$PROJECT_DIR$/imgs/flips_and_patterns_pseudoinverse_sc_100.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgs/pattern_retrieval.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/.ipynb_checkpoints/Hopfield networks tutorial-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/.ipynb_checkpoints/Hopfield networks tutorial-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Hopfield networks tutorial.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield networks tutorial.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Hopfield_net.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield_net.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/experiments.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiments_continuous_states.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/simulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/visualisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/visualisation.py" afterDir="false" />
     </list>
@@ -146,8 +138,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.simulations" />
-        <item itemvalue="Python.visualisation" />
         <item itemvalue="Python.Hopfield_net" />
+        <item itemvalue="Python.visualisation" />
         <item itemvalue="Python.experiments" />
       </list>
     </recent_temporary>
@@ -212,11 +204,6 @@
           <option name="timeStamp" value="73" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/Hopfield_net.py</url>
-          <line>65</line>
-          <option name="timeStamp" value="75" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/visualisation.py</url>
           <line>91</line>
           <option name="timeStamp" value="79" />
@@ -230,11 +217,6 @@
           <url>file://$PROJECT_DIR$/src/visualisation.py</url>
           <line>77</line>
           <option name="timeStamp" value="81" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/Hopfield_net.py</url>
-          <line>83</line>
-          <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/experiments_continuous_states.py</url>
