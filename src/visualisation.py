@@ -92,4 +92,4 @@ def flips_and_patterns_contour_plot(file_name):
     fig.savefig('../imgs/' + file_name.split('.pkl')[0].split('/')[-1] + '.png')
 
 if __name__ == '__main__':
-    flips_and_patterns_contour_plot('../data/flips_and_patterns_StorkeyAsymm_100.pkl')
+    flips_and_patterns_contour_plot('../data/flips_and_patterns_Hebb_sc_120.pkl')

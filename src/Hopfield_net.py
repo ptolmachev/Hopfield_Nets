@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
 from matplotlib import pyplot as plt
-from learning_rules import *
+from src.learning_rules import *
 
 def random_state(p, n):
     return np.array([np.sign(np.random.rand()-p) for i in range(n)])
@@ -46,25 +46,34 @@ class Hopfield_network():
     def learn_patterns(self, patterns, rule='pseudoinverse', incremental = False, sc = True):
         patterns = np.array(patterns).reshape(-1,len(patterns[0]))
         if rule == 'Hebb':
-            self.weights = hebbian_lr(self.num_neurons, incremental, self.weights, self.biases)
+            self.weights = hebbian_lr(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
         elif rule == 'pseudoinverse':
-            self.weights = pseudoinverse(self.num_neurons,incremental, self.weights, self.biases)
+            self.weights = pseudoinverse(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
         elif rule =='Storkey2ndOrder':
-            self.weights = storkey_2_order(self.num_neurons, incremental, self.weights, self.biases)
+            self.weights = storkey_2_order(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
         elif rule == 'StorkeySimplified':
-            self.weights = storkey_simplified(self.num_neurons, incremental, self.weights, self.biases)
+            self.weights = storkey_simplified(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
         elif rule == 'StorkeyAsymm':
-            self.weights = storkey_asymmetric(self.num_neurons, incremental, self.weights, self.biases)
+            self.weights = storkey_asymmetric(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
         elif rule =='StorkeyOriginal':
-            self.weights = storkey_original(self.num_neurons, incremental, self.weights, self.biases)
-        elif rule == 'Optimised_QP':
-            self.weights = optimisation_quadratic(self.num_neurons, incremental, self.weights, self.biases)
-        elif rule == 'Optimised_sequential_QP':
-            self.weights = optimisation_sequential_quadratic(self.num_neurons, incremental, self.weights, self.biases)
+            self.weights = storkey_original(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'OptimisedQP':
+            self.weights = optimisation_quadratic(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'OptimisedSequentialQP':
+            self.weights = optimisation_sequential_quadratic(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'OptimisedLP':
+            self.weights = optimisation_linear(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'OptimisedQPincremental':
+            self.weights = optimisation_incremental_quadratic(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'OptimisedLPincremental':
+            self.weights = optimisation_incremental_linear(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'InsecurityLR':
+            self.weights = insecurity_lr(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'InsecurityLRSymm':
+            self.weights = insecurity_lr_symm(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
         else:
-            raise ValueError('the parameter rule can only take values: \'Hebb\', \'Storkey\', \'pseudoinverse\'')
-        if sc == False:
-            self.weights[np.arange(self.num_neurons), np.arange(self.num_neurons)] = np.zeros(self.num_neurons)
+            # raise ValueError('the parameter rule can only take values: \'Hebb\', \'Storkey\', \'pseudoinverse\'')
+            raise ValueError('the specified learning rule is not implemented')
         return None
 
     def set_weights(self, new_weights):
