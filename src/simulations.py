@@ -8,11 +8,11 @@ from src.visualisation import flips_and_patterns_contour_plot
 
 num_neurons = 100
 num_of_flips = 100
-num_of_patterns = 120
+num_of_patterns = 150
 num_repetitions = 10
 sync = True
 time = 50
-rules = ['Hebb', 'Storkey2ndOrder', 'StorkeySimplified', 'StorkeyAsymm', 'pseudoinverse']
+rules = ['DescentLRSymm','StorkeySimplified', 'StorkeyAsymm', 'pseudoinverse']#['DescentLRFull', 'DescentLR', 'DescentLRSymm', 'Hebb', 'StorkeyOriginal', 'Storkey2ndOrder', 'StorkeySimplified', 'StorkeyAsymm', 'pseudoinverse']
 for rule in rules:
     for sc in [True, False]:
         incremental = True

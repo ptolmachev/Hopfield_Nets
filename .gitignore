@@ -2,3 +2,5 @@
 src/experiments_continuous_states.py
 
 *.pkl
+
+*.png

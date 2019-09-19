@@ -67,10 +67,12 @@ class Hopfield_network():
             self.weights = optimisation_incremental_quadratic(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
         elif rule == 'OptimisedLPincremental':
             self.weights = optimisation_incremental_linear(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
-        elif rule == 'InsecurityLR':
-            self.weights = insecurity_lr(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
-        elif rule == 'InsecurityLRSymm':
-            self.weights = insecurity_lr_symm(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'DescentL2':
+            self.weights = descent_l2(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'DescentL2Full':
+            self.weights = descent_l2_norm(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
+        elif rule == 'DescentL2Symm':
+            self.weights = descent_l2_symm(self.num_neurons, patterns, incremental, sc, self.weights, self.biases)
         else:
             # raise ValueError('the parameter rule can only take values: \'Hebb\', \'Storkey\', \'pseudoinverse\'')
             raise ValueError('the specified learning rule is not implemented')
