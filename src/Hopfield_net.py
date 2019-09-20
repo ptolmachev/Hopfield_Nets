@@ -33,7 +33,7 @@ class Hopfield_network():
 
     def update_state(self, sync=True):
         if sync == True:
-            self.hidden_state = np.matmul(self.weights, self.state) + self.biases
+            self.hidden_state = (self.weights @ self.state.reshape(-1, 1) + self.biases.reshape(-1, 1)).flatten()
             self.state = np.sign(self.hidden_state)
         elif sync == False:
             for i in range(self.num_neurons):
@@ -47,37 +47,37 @@ class Hopfield_network():
         patterns = np.array(patterns).reshape(-1, len(patterns[0]))
         rule = options['rule']
         if rule == 'Hebb':
-            self.weights = hebbian_lr(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = hebbian_lr(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'pseudoinverse':
-            self.weights = pseudoinverse(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = pseudoinverse(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule =='Storkey2ndOrder':
-            self.weights = storkey_2_order(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = storkey_2_order(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'StorkeySimplified':
-            self.weights = storkey_simplified(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = storkey_simplified(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'StorkeyAsymm':
-            self.weights = storkey_asymmetric(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = storkey_asymmetric(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule =='StorkeyOriginal':
-            self.weights = storkey_original(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = storkey_original(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'OptimisedQP':
             self.weights = optimisation_quadratic(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'OptimisedSequentialQP':
-            self.weights = optimisation_sequential_quadratic(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = optimisation_sequential_quadratic(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'OptimisedLP':
-            self.weights = optimisation_linear(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = optimisation_linear(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'OptimisedQPincremental':
-            self.weights = optimisation_incremental_quadratic(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = optimisation_incremental_quadratic(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'OptimisedLPincremental':
-            self.weights = optimisation_incremental_linear(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = optimisation_incremental_linear(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentL2':
             self.weights, self.biases = descent_l2_norm(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentL2Symm':
             self.weights, self.biases = descent_l2_symm(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentCrossentropy':
-            self.weights = descent_crossentropy(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = descent_crossentropy(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentHamming':
-            self.weights = descent_Hamming(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = descent_Hamming(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentOverlap':
-            self.weights = descent_overlap(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = descent_overlap(self.num_neurons, patterns, self.weights, self.biases, options)
         else:
             raise ValueError('the specified learning rule is not implemented')
         return None
