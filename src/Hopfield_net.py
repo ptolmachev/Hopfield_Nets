@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
 from matplotlib import pyplot as plt
-import learning_rules
+from learning_rules import *
 
 def random_state(p, n):
     return np.array([np.sign(np.random.rand()-p) for i in range(n)])
@@ -46,7 +46,6 @@ class Hopfield_network():
     def learn_patterns(self, patterns, options):
         patterns = np.array(patterns).reshape(-1, len(patterns[0]))
         rule = options['rule']
-
         if rule == 'Hebb':
             self.weights = hebbian_lr(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'pseudoinverse':

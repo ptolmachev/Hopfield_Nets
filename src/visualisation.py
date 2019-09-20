@@ -36,7 +36,7 @@ def visualise_patterns(patterns, initial_state, retrieved_pattern):
     plt.show()
 
 
-def run_visualisation(rule = 'pseudoinverse', incremental = False, flips = 10, sync = False, time = 50, random_patterns = False, num_it = 100):
+def run_visualisation(options, flips = 10, sync = False, time = 50, random_patterns = False ):
     n = 10
     num_neurons = n**2
     HN = Hopfield_network(num_neurons=num_neurons)
@@ -66,7 +66,7 @@ def run_visualisation(rule = 'pseudoinverse', incremental = False, flips = 10, s
         patterns[2] = letter_T.flatten()
         patterns[3] = letter_E.flatten()
 
-    HN.learn_patterns(patterns, options={'rule' : rule, 'incremental' : incremental, 'num_it' : num_it})
+    HN.learn_patterns(patterns, options=options)
     pattern_r = deepcopy(introduce_random_flips(patterns[0], flips))
     retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, time, record=False)
     visualise_patterns(patterns, pattern_r, retrieved_pattern)
@@ -75,8 +75,8 @@ def run_visualisation(rule = 'pseudoinverse', incremental = False, flips = 10, s
 
 def flips_and_patterns_contour_plot(file_name):
     results = pickle.load(open(file_name, 'rb+'))
-    sc = True if '_sc_' in file_name else False
-    rule = file_name.split('.pkl')[0].split('_')[-3 if sc else -2]
+    sc = False
+    rule = file_name.split('.pkl')[0].split('_')[3]
     # results = (results[:, :results.shape[1] // 2, :] - results[:, results.shape[1] // 2:, :][:, ::-1, :]) / 2
     avg = pd.DataFrame(np.mean(results, axis=-1)).fillna(0)
     fig, axs = plt.subplots(1, 1)
@@ -118,5 +118,5 @@ def flips_and_patterns_3d(file_name):
     plt.show()
     # fig.savefig('../imgs/' + file_name.split('.pkl')[0].split('/')[-1] + '.png')
 if __name__ == '__main__':
-    flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2_sc_75.pkl')
+    flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2_75.pkl')
     # flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2Symm_sc_75.pkl')

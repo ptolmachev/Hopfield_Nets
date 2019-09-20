@@ -29,28 +29,19 @@ def l1_minimisation(N, G, h): # l1 norm minimization of x, given inequality cons
 
 def hebbian_lr(N, patterns, weights, biases, options):
     sc = options['sc']
-    incremental = options['incremental']
-    if incremental == True:
-        raise AttributeError('The is no separate incremental implementation of Hebb\'s learning rule since it is'
-                             ' no different from the nonincremental one in terms of the end result')
-    else:
-        Z = patterns.T.reshape(N, -1)
-        Y = Z @ Z.T
-        if sc == False:
-            Y[np.arange(N), np.arange(N)] = np.zeros(N)
+    Z = patterns.T.reshape(N, -1)
+    Y = Z @ Z.T
+    if sc == False:
+        Y[np.arange(N), np.arange(N)] = np.zeros(N)
     return (1 / N) * Y
 
 def pseudoinverse(N, patterns, weights, biases, options):
     sc = options['sc']
-    incremental = options['incremental']
-    if incremental == True:
-        raise AttributeError('The pseudoiverse learning rule can\'t be incremental')
-    else:
-        Z = patterns.T.reshape(N, -1)
-        Y = Z @ np.linalg.pinv(Z)
-        if sc == False:
-            Y[np.arange(N), np.arange(N)] = np.zeros(N)
-        weights = Y
+    Z = patterns.T.reshape(N, -1)
+    Y = Z @ np.linalg.pinv(Z)
+    if sc == False:
+        Y[np.arange(N), np.arange(N)] = np.zeros(N)
+    weights = Y
     return weights, biases
 
 def storkey_2_order(N, patterns, weights, biases, options):
@@ -192,7 +183,6 @@ def optimisation_sequential_quadratic(N, patterns, weights, biases, options):
 def optimisation_incremental_quadratic(N, patterns, weights, biases, options):
     sc = options['sc']
     Z = patterns.T.reshape(N, -1)
-    Z = patterns.T.reshape(N, -1)
     epsilon = 1
     for i in range(Z.shape[-1]):
         pattern = Z[:, i].reshape(-1, 1)
@@ -284,7 +274,7 @@ def descent_overlap(N, patterns, weights, biases, options):
                 if sc == False:
                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
                 weights += Y
-                biases += delta_b
+                biases += delta_b.flatten()
     else:
         Z = patterns.T.reshape(N, -1)
         p = Z.shape[-1]
@@ -299,7 +289,7 @@ def descent_overlap(N, patterns, weights, biases, options):
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
             weights += Y
-            biases += delta_b
+            biases += delta_b.flatten()
     return weights, biases
 
 def descent_Hamming(N, patterns, weights, biases, options):
@@ -322,7 +312,7 @@ def descent_Hamming(N, patterns, weights, biases, options):
                 if sc == False:
                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
                 weights += Y
-                biases += delta_b
+                biases += delta_b.flatten()
     else:
         Z = patterns.T.reshape(N, -1)
         p = Z.shape[-1]
@@ -337,7 +327,7 @@ def descent_Hamming(N, patterns, weights, biases, options):
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
             weights += Y
-            biases += delta_b
+            biases += delta_b.flatten()
     return weights, biases
 
 def descent_crossentropy(N, patterns, weights, biases, options):
@@ -360,7 +350,7 @@ def descent_crossentropy(N, patterns, weights, biases, options):
                 if sc == False:
                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
                 weights += Y
-                biases += delta_b
+                biases += delta_b.flatten()
     else:
         Z = patterns.T.reshape(N, -1)
         p = Z.shape[-1]
@@ -375,5 +365,5 @@ def descent_crossentropy(N, patterns, weights, biases, options):
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
             weights += Y
-            biases += delta_b
+            biases += delta_b.flatten()
     return weights, biases
