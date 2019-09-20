@@ -8,7 +8,10 @@ import matplotlib.gridspec as gridspec
 from copy import deepcopy
 import pickle
 import pandas as pd
-
+from matplotlib import cm
+from mpl_toolkits.mplot3d.axes3d import get_test_data
+# This import registers the 3D projection, but is otherwise unused.
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 
 def visualise_patterns(patterns, initial_state, retrieved_pattern):
     n = (int(np.sqrt(initial_state.shape[-1])))
@@ -33,7 +36,7 @@ def visualise_patterns(patterns, initial_state, retrieved_pattern):
     plt.show()
 
 
-def run_visualisation(rule = 'pseudoinverse', incremental = False, flips = 10, sync = False, time = 50, random_patterns = False):
+def run_visualisation(rule = 'pseudoinverse', incremental = False, flips = 10, sync = False, time = 50, random_patterns = False, num_it = 100):
     n = 10
     num_neurons = n**2
     HN = Hopfield_network(num_neurons=num_neurons)
@@ -63,8 +66,8 @@ def run_visualisation(rule = 'pseudoinverse', incremental = False, flips = 10, s
         patterns[2] = letter_T.flatten()
         patterns[3] = letter_E.flatten()
 
-    HN.learn_patterns(patterns, rule=rule, incremental=incremental)
-    pattern_r = introduce_random_flips(patterns[0], flips)
+    HN.learn_patterns(patterns, rule=rule, num_it=num_it, incremental=incremental)
+    pattern_r = deepcopy(introduce_random_flips(patterns[0], flips))
     retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, time, record=False)
     visualise_patterns(patterns, pattern_r, retrieved_pattern)
     return None
@@ -76,10 +79,10 @@ def flips_and_patterns_contour_plot(file_name):
     rule = file_name.split('.pkl')[0].split('_')[-3 if sc else -2]
     # results = (results[:, :results.shape[1] // 2, :] - results[:, results.shape[1] // 2:, :][:, ::-1, :]) / 2
     avg = pd.DataFrame(np.mean(results, axis=-1)).fillna(0)
-
     fig, axs = plt.subplots(1, 1)
     cs = axs.contourf(avg, levels=np.linspace(-1., 1.0, 41), cmap='coolwarm', extend='both', linestyles='solid')
-    axs.contour(avg, levels=np.linspace(-1, 1, 41), colors='k', linestyles='dashed', linewidths=0.25)
+    # axs.contour(avg, levels=np.linspace(-1, 1, 41), colors='k', linestyles='dashed', linewidths=0.25)
+    axs.contour(avg, levels=[-0.95, 0.95], colors='k', linestyles='solid', linewidths=1)
     axs.set_xlabel('Number of flips in the initial state', fontsize=24)
     axs.set_ylabel('Number of memorised patterns', fontsize=24)
     # axs.set_xticklabels(20*np.arange(5), fontsize=16)
@@ -91,5 +94,31 @@ def flips_and_patterns_contour_plot(file_name):
     plt.show()
     fig.savefig('../imgs/' + file_name.split('.pkl')[0].split('/')[-1] + '.png')
 
+def flips_and_patterns_3d(file_name):
+    results = pickle.load(open(file_name, 'rb+'))
+    sc = True if '_sc_' in file_name else False
+    rule = file_name.split('.pkl')[0].split('_')[-3 if sc else -2]
+    avg = np.array(pd.DataFrame(np.mean(results, axis=-1)).fillna(0))
+    avg = avg[:,:-1]
+
+    avg = (avg[:,:avg.shape[-1]//2] - avg[:,1 + avg.shape[-1]//2:][:,::-1])/2
+    fig = plt.figure(figsize=plt.figaspect(0.5))
+    axs = fig.add_subplot(1, 1, 1,  projection='3d')
+    X = np.arange(1, avg.shape[1] + 1)
+    Y = np.arange(1, avg.shape[0] + 1)
+    X, Y = np.meshgrid(X, Y)
+    surf = axs.plot_surface(X, Y, avg, rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+    axs.set_zlim(0.0, 1.1)
+    fig.colorbar(surf, shrink=0.5, aspect=10)
+    axs.set_xlabel('Number of flips in the initial state', fontsize=24)
+    axs.set_ylabel('Number of memorised patterns', fontsize=24)
+    # axs.set_xticklabels(20*np.arange(5), fontsize=16)
+    # axs.set_yticklabels(20*np.arange(5), fontsize=16)
+    axs.set_title(
+        f'The dependence of overlap between the true and retrieved states on flips \n in initial conditions and number of stored patterns (rule = {rule}, sc = {sc})',
+        fontsize=24)
+    plt.show()
+    # fig.savefig('../imgs/' + file_name.split('.pkl')[0].split('/')[-1] + '.png')
 if __name__ == '__main__':
-    flips_and_patterns_contour_plot('../data/flips_and_patterns_StorkeyAsymm_150.pkl')
+    flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2_sc_75.pkl')
+    # flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2Symm_sc_75.pkl')
