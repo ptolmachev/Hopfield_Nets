@@ -227,17 +227,21 @@ def optimisation_incremental_linear(N, patterns, weights, biases, options):
     return weights, biases
 
 def descent_l2_norm(N, patterns, weights, biases, options):
-    lmbd = 0.5
+    lmbd = options['lambda']
     incremental = options['incremental']
     sc = options['sc']
     num_it = options['num_it']
+    symm = options['symm']
     if incremental == True:
         for i in range(patterns.shape[0]):
             pattern = patterns[i].reshape(-1, 1)
             for j in range(num_it):
                 lf = weights @ pattern + biases.reshape(-1,1)
                 A = 2 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * (np.tanh(lmbd * lf) - pattern)
-                Y = - A @ pattern.T
+                if symm == False:
+                    Y = - A @ pattern.T
+                else:
+                    Y = - (A @ pattern.T + pattern @ A.T)/2
                 delta_b = - A
                 if sc == False:
                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
@@ -249,7 +253,10 @@ def descent_l2_norm(N, patterns, weights, biases, options):
         for j in range(num_it):
             lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
             A = 2 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * (np.tanh(lmbd * lf) - Z)
-            Y = - (A @ Z.T)
+            if symm == False:
+                Y = - (A @ Z.T)
+            else:
+                Y = - (A @ Z.T + Z @ A.T) / 2
             delta_b = - np.mean(A, axis = 1)
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
@@ -257,49 +264,22 @@ def descent_l2_norm(N, patterns, weights, biases, options):
             biases += delta_b.flatten()
     return weights, biases
 
-def descent_l2_symm(N, patterns, weights, biases, **options):
-    lmbd = 0.5
+def descent_overlap(N, patterns, weights, biases, options):
+    lmbd = options['lambda']
     incremental = options['incremental']
     sc = options['sc']
     num_it = options['num_it']
-    if incremental == True:
-        for i in range(patterns.shape[0]):
-            pattern = patterns[i].reshape(-1, 1)
-            for j in range(num_it):
-                lf = weights @ pattern + biases.reshape(-1,1)
-                A = 2 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * (np.tanh(lmbd * lf) - pattern)
-                Y = - (A @ pattern.T) - (pattern @ A.T)
-                delta_b = - A
-                if sc == False:
-                    Y[np.arange(N), np.arange(N)] = np.zeros(N)
-                weights += Y
-                biases += delta_b.flatten()
-    else:
-        Z = patterns.T.reshape(N, -1)
-        p = Z.shape[-1]
-        for j in range(num_it):
-            lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-            A = np.tanh(lmbd * lf) - Z
-            Y = - (A @ Z.T) - (Z @ A.T)
-            delta_b = - np.mean(A, axis=1)
-            if sc == False:
-                Y[np.arange(N), np.arange(N)] = np.zeros(N)
-            weights += 0.1*Y
-            biases += 0.1*delta_b.flatten()
-    return weights, biases
-
-def descent_overlap(N, patterns, weights, biases, **options):
-    lmbd = 0.5
-    incremental = options['incremental']
-    sc = options['sc']
-    num_it = options['num_it']
+    symm = options['symm']
     if incremental == True:
         for i in range(patterns.shape[0]):
             pattern = patterns[i].reshape(-1, 1)
             for j in range(num_it):
                 lf = weights @ pattern + biases.reshape(-1, 1)
                 A = (lmbd * (1 - (np.tanh(lmbd * lf)**2)) * pattern)
-                Y = - (A @ pattern.T) / N #- (A @ pattern.T + pattern @ A.T) / (2 * N)
+                if symm == False:
+                    Y = - A @ pattern.T
+                else:
+                    Y = - (A @ pattern.T + pattern @ A.T) / 2
                 delta_b = - A
                 if sc == False:
                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
@@ -311,7 +291,10 @@ def descent_overlap(N, patterns, weights, biases, **options):
         for j in range(num_it):
             lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
             A = (lmbd * (1 - (np.tanh(lmbd * lf) ** 2)) * Z)
-            Y = - (A @ Z.T) / N #- (A @ Z.T + Z @ A.T) / (2 * N)
+            if symm == False:
+                Y = - (A @ Z.T)
+            else:
+                Y = - (A @ Z.T + Z @ A.T) / 2
             delta_b = - np.mean(A, axis = 1)
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
@@ -319,18 +302,22 @@ def descent_overlap(N, patterns, weights, biases, **options):
             biases += delta_b
     return weights, biases
 
-def descent_Hamming(N, patterns, weights, biases, **options):
-    lmbd = 0.5
+def descent_Hamming(N, patterns, weights, biases, options):
+    lmbd = options['lambda']
     incremental = options['incremental']
     sc = options['sc']
     num_it = options['num_it']
+    symm = options['symm']
     if incremental == True:
         for i in range(patterns.shape[0]):
             pattern = patterns[i].reshape(-1, 1)
             for j in range(num_it):
                 lf = weights @ pattern + biases.reshape(-1, 1)
                 A = (0.5 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * np.sign(np.tanh(lmbd * lf) - pattern)) / N
-                Y = - (A @ pattern.T)
+                if symm == False:
+                    Y = - A @ pattern.T
+                else:
+                    Y = - (A @ pattern.T + pattern @ A.T) / 2
                 delta_b = - A
                 if sc == False:
                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
@@ -342,7 +329,10 @@ def descent_Hamming(N, patterns, weights, biases, **options):
         for j in range(num_it):
             lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
             A = (0.5 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * np.sign(np.tanh(lmbd * lf) - Z)) / N
-            Y = - (A @ Z.T)
+            if symm == False:
+                Y = - (A @ Z.T)
+            else:
+                Y = - (A @ Z.T + Z @ A.T) / 2
             delta_b = - np.mean(A, axis = 1)
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
@@ -350,18 +340,22 @@ def descent_Hamming(N, patterns, weights, biases, **options):
             biases += delta_b
     return weights, biases
 
-def descent_crossentropy(N, patterns, weights, biases, **options):
-    lmbd = 0.5
+def descent_crossentropy(N, patterns, weights, biases, options):
+    lmbd = options['lambda']
     incremental = options['incremental']
     sc = options['sc']
     num_it = options['num_it']
+    symm = options['symm']
     if incremental == True:
         for i in range(patterns.shape[0]):
             pattern = patterns[i].reshape(-1, 1)
             for j in range(num_it):
                 lf = weights @ pattern + biases.reshape(-1, 1)
                 A = -(0.5 * lmbd * (pattern - np.tanh(lf)))
-                Y = - (A @ pattern.T)
+                if symm == False:
+                    Y = - A @ pattern.T
+                else:
+                    Y = - (A @ pattern.T + pattern @ A.T) / 2
                 delta_b = - A
                 if sc == False:
                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
@@ -373,7 +367,10 @@ def descent_crossentropy(N, patterns, weights, biases, **options):
         for j in range(num_it):
             lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
             A = -(0.5 * lmbd * (Z - np.tanh(lf)))
-            Y = - ( A @ Z.T )
+            if symm == False:
+                Y = - (A @ Z.T)
+            else:
+                Y = - (A @ Z.T + Z @ A.T) / 2
             delta_b = - np.mean(A, axis = 1)
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)

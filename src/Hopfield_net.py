@@ -88,6 +88,7 @@ class Hopfield_network():
         return None
 
     def retrieve_pattern(self, initial_state, sync, time, record = False):
+        global data
         self.state = deepcopy(initial_state)
         t = 0
         if record == True:
@@ -226,7 +227,7 @@ if __name__ == '__main__':
     num_neurons = 150
     num_patterns = 20
     sync = True
-    rule = 'StorkeyAssym2'
+    rule = 'StorkeyAsymm'
     flips = 40
     time = 50
     HN = Hopfield_network(num_neurons=num_neurons)
