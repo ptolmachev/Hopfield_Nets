@@ -66,7 +66,7 @@ def run_visualisation(rule = 'pseudoinverse', incremental = False, flips = 10, s
         patterns[2] = letter_T.flatten()
         patterns[3] = letter_E.flatten()
 
-    HN.learn_patterns(patterns, rule=rule, num_it=num_it, incremental=incremental)
+    HN.learn_patterns(patterns, options={'rule' : rule, 'incremental' : incremental, 'num_it' : num_it})
     pattern_r = deepcopy(introduce_random_flips(patterns[0], flips))
     retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, time, record=False)
     visualise_patterns(patterns, pattern_r, retrieved_pattern)
@@ -99,8 +99,6 @@ def flips_and_patterns_3d(file_name):
     sc = True if '_sc_' in file_name else False
     rule = file_name.split('.pkl')[0].split('_')[-3 if sc else -2]
     avg = np.array(pd.DataFrame(np.mean(results, axis=-1)).fillna(0))
-    avg = avg[:,:-1]
-
     avg = (avg[:,:avg.shape[-1]//2] - avg[:,1 + avg.shape[-1]//2:][:,::-1])/2
     fig = plt.figure(figsize=plt.figaspect(0.5))
     axs = fig.add_subplot(1, 1, 1,  projection='3d')

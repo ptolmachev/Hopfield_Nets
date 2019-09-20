@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
 from matplotlib import pyplot as plt
-from learning_rules import *
+import learning_rules
 
 def random_state(p, n):
     return np.array([np.sign(np.random.rand()-p) for i in range(n)])
@@ -234,7 +234,7 @@ if __name__ == '__main__':
     # HN = Continuous_HN(num_neurons=num_neurons, T=0.3, dt=0.1)
     # HN = Continuous_HN_ad(num_neurons=num_neurons, slope=3, dt=0.1, a=0.0000001, b=1)
     patterns = [random_state_(0.5, num_neurons) for i in range(num_patterns)]
-    HN.learn_patterns(patterns, rule=rule, incremental=True)
+    HN.learn_patterns(patterns, options={'rule' : rule, 'incremental' : True})
 
     pattern_r = introduce_random_flips(patterns[0], flips)
 
