@@ -6,7 +6,9 @@
       <change beforePath="$PROJECT_DIR$/src/.ipynb_checkpoints/Hopfield networks tutorial-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/.ipynb_checkpoints/Hopfield networks tutorial-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Hopfield networks tutorial.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield networks tutorial.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Hopfield_net.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield_net.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/learning_rules.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/learning_rules.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/simulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/visualisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/visualisation.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -48,7 +50,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.simulations">
+  <component name="RunManager" selected="Python.visualisation">
     <configuration name="Hopfield_net" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Hopfield_Nets" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -135,8 +137,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.simulations" />
         <item itemvalue="Python.visualisation" />
+        <item itemvalue="Python.simulations" />
         <item itemvalue="Python.Hopfield_net" />
         <item itemvalue="Python.experiments" />
       </list>
@@ -237,12 +239,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/learning_rules.py</url>
-          <line>368</line>
+          <line>406</line>
           <option name="timeStamp" value="117" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/simulations.py</url>
-          <line>36</line>
+          <line>41</line>
           <option name="timeStamp" value="119" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -252,7 +254,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/learning_rules.py</url>
-          <line>351</line>
+          <line>389</line>
           <option name="timeStamp" value="121" />
         </line-breakpoint>
       </breakpoints>

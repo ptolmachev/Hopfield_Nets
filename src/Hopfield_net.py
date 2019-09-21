@@ -70,6 +70,8 @@ class Hopfield_network():
             self.weights, self.biases = optimisation_incremental_linear(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentL2':
             self.weights, self.biases = descent_l2_norm(self.num_neurons, patterns, self.weights, self.biases, options)
+        elif rule == 'DescentL2LinearActivation':
+            self.weights, self.biases = descent_l2_norm_linear_activation(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentL2Symm':
             self.weights, self.biases = descent_l2_symm(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentCrossentropy':

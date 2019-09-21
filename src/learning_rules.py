@@ -254,6 +254,44 @@ def descent_l2_norm(N, patterns, weights, biases, options):
             biases += delta_b.flatten()
     return weights, biases
 
+def descent_l2_norm_linear_activation(N, patterns, weights, biases, options):
+    lmbd = options['lambda']
+    incremental = options['incremental']
+    sc = options['sc']
+    num_it = options['num_it']
+    symm = options['symm']
+    if incremental == True:
+        for i in range(patterns.shape[0]):
+            pattern = patterns[i].reshape(-1, 1)
+            for j in range(num_it):
+                lf = weights @ pattern + biases.reshape(-1,1)
+                A = 2 * lmbd * (lmbd * lf - pattern)
+                if symm == False:
+                    Y = - A @ pattern.T
+                else:
+                    Y = - (A @ pattern.T + pattern @ A.T)/2
+                delta_b = - A
+                if sc == False:
+                    Y[np.arange(N), np.arange(N)] = np.zeros(N)
+                weights += Y
+                biases += delta_b.flatten()
+    else:
+        Z = patterns.T.reshape(N, -1)
+        p = Z.shape[-1]
+        for j in range(num_it):
+            lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
+            A = 2 * lmbd * (lmbd * lf - Z)
+            if symm == False:
+                Y = - (A @ Z.T)
+            else:
+                Y = - (A @ Z.T + Z @ A.T) / 2
+            delta_b = - np.mean(A, axis = 1)
+            if sc == False:
+                Y[np.arange(N), np.arange(N)] = np.zeros(N)
+            weights += Y
+            biases += delta_b.flatten()
+    return weights, biases
+
 def descent_overlap(N, patterns, weights, biases, options):
     lmbd = options['lambda']
     incremental = options['incremental']
@@ -265,7 +303,7 @@ def descent_overlap(N, patterns, weights, biases, options):
             pattern = patterns[i].reshape(-1, 1)
             for j in range(num_it):
                 lf = weights @ pattern + biases.reshape(-1, 1)
-                A = (lmbd * (1 - (np.tanh(lmbd * lf)**2)) * pattern)
+                A = -(lmbd * (1 - (np.tanh(lmbd * lf)**2)) * pattern)
                 if symm == False:
                     Y = - A @ pattern.T
                 else:

@@ -75,7 +75,7 @@ def run_visualisation(options, flips = 10, sync = False, time = 50, random_patte
 
 def flips_and_patterns_contour_plot(file_name):
     results = pickle.load(open(file_name, 'rb+'))
-    sc = False
+    sc = True if 'sc=True' in file_name else False
     rule = file_name.split('.pkl')[0].split('_')[3]
     # results = (results[:, :results.shape[1] // 2, :] - results[:, results.shape[1] // 2:, :][:, ::-1, :]) / 2
     avg = pd.DataFrame(np.mean(results, axis=-1)).fillna(0)
@@ -96,8 +96,8 @@ def flips_and_patterns_contour_plot(file_name):
 
 def flips_and_patterns_3d(file_name):
     results = pickle.load(open(file_name, 'rb+'))
-    sc = True if '_sc_' in file_name else False
-    rule = file_name.split('.pkl')[0].split('_')[-3 if sc else -2]
+    sc = True if 'sc=True' in file_name else False
+    rule = file_name.split('.pkl')[0].split('_')[3]
     avg = np.array(pd.DataFrame(np.mean(results, axis=-1)).fillna(0))
     avg = (avg[:,:avg.shape[-1]//2] - avg[:,1 + avg.shape[-1]//2:][:,::-1])/2
     fig = plt.figure(figsize=plt.figaspect(0.5))
@@ -118,5 +118,5 @@ def flips_and_patterns_3d(file_name):
     plt.show()
     # fig.savefig('../imgs/' + file_name.split('.pkl')[0].split('/')[-1] + '.png')
 if __name__ == '__main__':
-    flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2_75.pkl')
+    flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2_sc=True_symm=True_incremental=True_lmbd=0.5_100x120.pkl')
     # flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2Symm_sc_75.pkl')
