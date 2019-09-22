@@ -33,7 +33,8 @@ def hebbian_lr(N, patterns, weights, biases, options):
     Y = Z @ Z.T
     if sc == False:
         Y[np.arange(N), np.arange(N)] = np.zeros(N)
-    return (1 / N) * Y
+    weights = (1 / N) * Y
+    return weights, biases
 
 def pseudoinverse(N, patterns, weights, biases, options):
     sc = options['sc']

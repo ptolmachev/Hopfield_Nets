@@ -118,5 +118,5 @@ def flips_and_patterns_3d(file_name):
     plt.show()
     # fig.savefig('../imgs/' + file_name.split('.pkl')[0].split('/')[-1] + '.png')
 if __name__ == '__main__':
-    flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2_sc=True_symm=True_incremental=True_lmbd=0.5_100x120.pkl')
+    flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentOverlap_sc=True_symm=True_incremental=True_lmbd=0.5_100x120.pkl')
     # flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2Symm_sc_75.pkl')

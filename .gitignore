@@ -3,4 +3,9 @@ src/experiments_continuous_states.py
 
 *.pkl
 
-*.png
+
+imgs/imgs_old/
+
+imgs/flips_and_patterns_DescentOverlap_sc=True_symm=True_incremental=True_10x15\.png
+
+imgs/
