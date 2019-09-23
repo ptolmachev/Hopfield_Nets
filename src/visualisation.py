@@ -1,6 +1,7 @@
 # import sys
 # sys.path.insert(0, '../src')
 from Hopfield_net import Hopfield_network, random_state, introduce_random_flips
+from utils import *
 import unittest
 from matplotlib import pyplot as plt
 import numpy as np
@@ -36,7 +37,7 @@ def visualise_patterns(patterns, initial_state, retrieved_pattern):
     plt.show()
 
 
-def run_visualisation(options, flips = 10, sync = False, time = 50, random_patterns = False ):
+def run_visualisation(options, flips = 10, sync = False, time = 50, pattern_num = 0, random_patterns = False ):
     n = 10
     num_neurons = n**2
     HN = Hopfield_network(num_neurons=num_neurons)
@@ -67,7 +68,7 @@ def run_visualisation(options, flips = 10, sync = False, time = 50, random_patte
         patterns[3] = letter_E.flatten()
 
     HN.learn_patterns(patterns, options=options)
-    pattern_r = deepcopy(introduce_random_flips(patterns[0], flips))
+    pattern_r = deepcopy(introduce_random_flips(patterns[pattern_num], flips))
     retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, time, record=False)
     visualise_patterns(patterns, pattern_r, retrieved_pattern)
     return None
@@ -117,6 +118,14 @@ def flips_and_patterns_3d(file_name):
         fontsize=24)
     plt.show()
     # fig.savefig('../imgs/' + file_name.split('.pkl')[0].split('/')[-1] + '.png')
+
+
+
 if __name__ == '__main__':
-    flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentOverlap_sc=True_symm=True_incremental=True_lmbd=0.5_100x120.pkl')
+    rule = 'pseudoinverse'
+    arguments = {'sc' : True}
+    num_neurons = 100
+    num_of_patterns = 150
+    file_name = f'../data/flips_and_patterns_{get_postfix(rule, arguments, num_neurons, num_of_patterns)}.pkl'
+    flips_and_patterns_contour_plot(file_name)
     # flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2Symm_sc_75.pkl')

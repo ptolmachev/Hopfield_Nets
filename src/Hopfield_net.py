@@ -43,17 +43,16 @@ class Hopfield_network():
             raise AttributeError('sync variable can take only boolean values')
         return None
 
-    def learn_patterns(self, patterns, options):
+    def learn_patterns(self, patterns, rule, options):
         patterns = np.array(patterns).reshape(-1, len(patterns[0]))
-        rule = options['rule']
         if rule == 'Hebb':
-            self.weights, self.biases = hebbian_lr(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = hebbian_lr(self.num_neurons, patterns, self.weights, self.biases,  **options)
         elif rule == 'pseudoinverse':
-            self.weights, self.biases = pseudoinverse(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = pseudoinverse(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule =='Storkey2ndOrder':
-            self.weights, self.biases = storkey_2_order(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = storkey_2_order(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'StorkeySimplified':
-            self.weights, self.biases = storkey_simplified(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = storkey_simplified(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'StorkeyAsymm':
             self.weights, self.biases = storkey_asymmetric(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule =='StorkeyOriginal':
@@ -70,8 +69,8 @@ class Hopfield_network():
             self.weights, self.biases = optimisation_incremental_linear(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentL2':
             self.weights, self.biases = descent_l2_norm(self.num_neurons, patterns, self.weights, self.biases, options)
-        elif rule == 'DescentL2LinearActivation':
-            self.weights, self.biases = descent_l2_norm_linear_activation(self.num_neurons, patterns, self.weights, self.biases, options)
+        elif rule == 'DescentL2Solver':
+            self.weights, self.biases = descent_l2_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL2Symm':
             self.weights, self.biases = descent_l2_symm(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentCrossentropy':
@@ -84,8 +83,9 @@ class Hopfield_network():
             raise ValueError('the specified learning rule is not implemented')
         return None
 
-    def set_weights(self, new_weights):
+    def set_params(self, new_weights, new_biases):
         self.weights = new_weights
+        self.biases = new_biases
         return None
 
     def retrieve_pattern(self, initial_state, sync, time, record = False):
@@ -225,20 +225,17 @@ class Continuous_HN_ad(Continuous_HN):
         return None
 
 if __name__ == '__main__':
-    num_neurons = 150
-    num_patterns = 20
+    num_neurons = 100
+    num_patterns = 10
     sync = True
-    rule = 'StorkeyAsymm'
-    flips = 40
-    time = 50
+    flips = 20
+    time = 100
+    rule = 'DescentL2Solver'
+    options = {'rule': rule, 'sc': True, 'symm': True, 'incremental': True, 'tol': 1e-3, 'lambda': 1.0, 'activation_function' : 'identity'}
     HN = Hopfield_network(num_neurons=num_neurons)
-    # HN = Boltzmann_machine(num_neurons=num_neurons,T_max=0.1, T_decay=0.99)
-    # HN = Continuous_HN(num_neurons=num_neurons, T=0.3, dt=0.1)
-    # HN = Continuous_HN_ad(num_neurons=num_neurons, slope=3, dt=0.1, a=0.0000001, b=1)
-    patterns = [random_state_(0.5, num_neurons) for i in range(num_patterns)]
-    HN.learn_patterns(patterns, options={'rule' : rule, 'incremental' : True})
-
-    pattern_r = introduce_random_flips(patterns[0], flips)
+    patterns = [random_state(0.5, num_neurons) for i in range(num_patterns)]
+    HN.learn_patterns(patterns, options)
+    pattern_r = introduce_random_flips(patterns[3], flips)
 
     print('\nSimilarity with different patterns (before): ')
     for i in range(len(patterns)):
