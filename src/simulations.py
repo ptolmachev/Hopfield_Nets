@@ -20,25 +20,31 @@ def flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitio
             print(f'repetition number {r}')
             for n_p in range(1,num_of_patterns+1):
                 print(f'learning {n_p} patterns')
-                patterns = [random_state(0.5, num_neurons) for i in range(n_p)]
-                HN.set_params(np.random.randn(num_neurons, num_neurons), np.random.randn(num_neurons))
+                patterns = deepcopy([random_state(0.5, num_neurons) for i in range(n_p)])
+
+                R = np.random.randn(num_neurons, num_neurons)
+                R = (R + R.T) / 2
+                R[np.arange(num_neurons), np.arange(num_neurons)] = np.zeros(num_neurons)
+
+                HN.set_params((1 / num_neurons) * R, np.zeros(num_neurons))
                 HN.learn_patterns(patterns, rule, options[i])
                 for n_f in range(1, num_of_flips+1):
-                    pattern_r = deepcopy(introduce_random_flips(patterns[-1], n_f))
+                    true_pattern = deepcopy(patterns[np.random.randint(len(patterns))])
+                    pattern_r = deepcopy(introduce_random_flips(true_pattern, n_f))
                     retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, time, record=False)
-                    overlap = (1 / num_neurons) * np.dot(retrieved_pattern, patterns[0])
+                    overlap = (1 / num_neurons) * np.dot(retrieved_pattern, true_pattern)
                     results[n_p - 1, n_f - 1, r] = overlap
         pickle.dump(results, open(file_name,'wb+'))
     return None
 
 if __name__ == '__main__':
     params = dict()
-    params['rules'] = ['pseudoinverse']
-    params['options'] = [{'sc' : True}]
+    params['rules'] = ['StorkeyAsymm']
+    params['options'] = [{'sc' : True, 'incremental' : True}]#[{'activation_function' : 'identity', 'lmbd' : 0.5, 'tol' : 1e-1}]
     params['time_of_retrieval'] = 10
     params['sync'] = True
-    num_neurons = 100
-    num_of_flips = 100 - 1
-    num_of_patterns = 150
+    num_neurons = 50
+    num_of_flips = 50 - 1
+    num_of_patterns = 75
     num_repetitions = 10
     flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitions, params)

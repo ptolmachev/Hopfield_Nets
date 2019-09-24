@@ -120,12 +120,11 @@ def flips_and_patterns_3d(file_name):
     # fig.savefig('../imgs/' + file_name.split('.pkl')[0].split('/')[-1] + '.png')
 
 
-
 if __name__ == '__main__':
-    rule = 'pseudoinverse'
-    arguments = {'sc' : True}
-    num_neurons = 100
-    num_of_patterns = 150
+    rule = 'StorkeyAsymm'
+    arguments = {'sc' : True, 'incremental' : True}
+    num_neurons = 50
+    num_of_patterns = 75
     file_name = f'../data/flips_and_patterns_{get_postfix(rule, arguments, num_neurons, num_of_patterns)}.pkl'
     flips_and_patterns_contour_plot(file_name)
     # flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2Symm_sc_75.pkl')

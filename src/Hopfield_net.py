@@ -23,10 +23,11 @@ def sigmoid(x):
 class Hopfield_network():
     def __init__(self, num_neurons):
         self.num_neurons = num_neurons
-        Y = np.random.randn(self.num_neurons,self.num_neurons)
+        Y = np.random.randn(self.num_neurons, self.num_neurons)
         R = (Y + Y.T) / 2
-        R[np.arange(num_neurons),np.arange(num_neurons)] = np.zeros(num_neurons)
+        R[np.arange(num_neurons), np.arange(num_neurons)] = np.zeros(num_neurons)
         self.weights = (1 / self.num_neurons) * R
+        # self.weights = np.zeros((self.num_neurons, self.num_neurons))
         self.biases = np.zeros(self.num_neurons)
         self.hidden_state = np.random.rand(num_neurons)-0.5
         self.state = np.sign(self.hidden_state)
@@ -44,7 +45,7 @@ class Hopfield_network():
         return None
 
     def learn_patterns(self, patterns, rule, options):
-        patterns = np.array(patterns).reshape(-1, len(patterns[0]))
+        patterns = deepcopy(np.array(patterns).reshape(-1, len(patterns[0])))
         if rule == 'Hebb':
             self.weights, self.biases = hebbian_lr(self.num_neurons, patterns, self.weights, self.biases,  **options)
         elif rule == 'pseudoinverse':
@@ -54,9 +55,9 @@ class Hopfield_network():
         elif rule == 'StorkeySimplified':
             self.weights, self.biases = storkey_simplified(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'StorkeyAsymm':
-            self.weights, self.biases = storkey_asymmetric(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = storkey_asymmetric(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule =='StorkeyOriginal':
-            self.weights, self.biases = storkey_original(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = storkey_original(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'OptimisedQP':
             self.weights = optimisation_quadratic(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'OptimisedSequentialQP':
@@ -68,7 +69,7 @@ class Hopfield_network():
         elif rule == 'OptimisedLPincremental':
             self.weights, self.biases = optimisation_incremental_linear(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentL2':
-            self.weights, self.biases = descent_l2_norm(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = descent_l2_norm(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL2Solver':
             self.weights, self.biases = descent_l2_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL2Symm':
@@ -78,7 +79,7 @@ class Hopfield_network():
         elif rule == 'DescentHamming':
             self.weights, self.biases = descent_Hamming(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentOverlap':
-            self.weights, self.biases = descent_overlap(self.num_neurons, patterns, self.weights, self.biases, options)
+            self.weights, self.biases = descent_overlap(self.num_neurons, patterns, self.weights, self.biases, **options)
         else:
             raise ValueError('the specified learning rule is not implemented')
         return None
