@@ -121,8 +121,10 @@ def flips_and_patterns_3d(file_name):
 
 
 if __name__ == '__main__':
-    rule = 'StorkeyAsymm'
-    arguments = {'sc' : True, 'incremental' : True}
+    rule = 'PseudoinverseNondiag'
+    # arguments = {'sc': True, 'incremental' : True, 'unlearning' : True, 'HN' : True, 'unlearn_rate' : 0.1, 'num_of_retrieval' : 10, 'sync' : True, 'time' : 10}
+    # arguments = {'activation_function': 'linear', 'tol': 1e-1, 'lmbd': 0.5}
+    arguments = {}
     num_neurons = 50
     num_of_patterns = 75
     file_name = f'../data/flips_and_patterns_{get_postfix(rule, arguments, num_neurons, num_of_patterns)}.pkl'

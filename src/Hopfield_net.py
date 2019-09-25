@@ -48,30 +48,26 @@ class Hopfield_network():
         patterns = deepcopy(np.array(patterns).reshape(-1, len(patterns[0])))
         if rule == 'Hebb':
             self.weights, self.biases = hebbian_lr(self.num_neurons, patterns, self.weights, self.biases,  **options)
-        elif rule == 'pseudoinverse':
+        elif rule == 'Pseudoinverse':
             self.weights, self.biases = pseudoinverse(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule =='Storkey2ndOrder':
-            self.weights, self.biases = storkey_2_order(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'PseudoinverseNondiag':
+            self.weights, self.biases = pseudoinverse_nondiag(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule =='Storkey':
+            self.weights, self.biases = storkey(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'StorkeyNormalisedLF':
+            self.weights, self.biases = storkey_normalised_lf(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'StorkeySimplified':
             self.weights, self.biases = storkey_simplified(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'StorkeyAsymm':
-            self.weights, self.biases = storkey_asymmetric(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule =='StorkeyOriginal':
-            self.weights, self.biases = storkey_original(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'OptimisedQP':
-            self.weights = optimisation_quadratic(self.num_neurons, patterns, self.weights, self.biases, options)
-        elif rule == 'OptimisedSequentialQP':
-            self.weights, self.biases = optimisation_sequential_quadratic(self.num_neurons, patterns, self.weights, self.biases, options)
-        elif rule == 'OptimisedLP':
-            self.weights, self.biases = optimisation_linear(self.num_neurons, patterns, self.weights, self.biases, options)
-        elif rule == 'OptimisedQPincremental':
-            self.weights, self.biases = optimisation_incremental_quadratic(self.num_neurons, patterns, self.weights, self.biases, options)
-        elif rule == 'OptimisedLPincremental':
-            self.weights, self.biases = optimisation_incremental_linear(self.num_neurons, patterns, self.weights, self.biases, options)
-        elif rule == 'DescentL2':
-            self.weights, self.biases = descent_l2_norm(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL2Solver':
             self.weights, self.biases = descent_l2_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentL1Solver':
+            self.weights, self.biases = descent_l1_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentOverlapSolver':
+            self.weights, self.biases = descent_overlap_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentCrossentropySolver':
+            self.weights, self.biases = descent_crossentropy_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentL2':
+            self.weights, self.biases = descent_l2_norm(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL2Symm':
             self.weights, self.biases = descent_l2_symm(self.num_neurons, patterns, self.weights, self.biases, options)
         elif rule == 'DescentCrossentropy':

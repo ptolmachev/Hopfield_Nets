@@ -27,9 +27,13 @@ def flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitio
                 R[np.arange(num_neurons), np.arange(num_neurons)] = np.zeros(num_neurons)
 
                 HN.set_params((1 / num_neurons) * R, np.zeros(num_neurons))
+                if ('unlearning' in options[i].keys()) and (options[i]['unlearning'] == True):
+                    options[i]['HN'] = HN
+
                 HN.learn_patterns(patterns, rule, options[i])
                 for n_f in range(1, num_of_flips+1):
-                    true_pattern = deepcopy(patterns[np.random.randint(len(patterns))])
+                    num = np.random.randint(len(patterns))
+                    true_pattern = deepcopy(patterns[num])
                     pattern_r = deepcopy(introduce_random_flips(true_pattern, n_f))
                     retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, time, record=False)
                     overlap = (1 / num_neurons) * np.dot(retrieved_pattern, true_pattern)
@@ -39,12 +43,14 @@ def flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitio
 
 if __name__ == '__main__':
     params = dict()
-    params['rules'] = ['StorkeyAsymm']
-    params['options'] = [{'sc' : True, 'incremental' : True}]#[{'activation_function' : 'identity', 'lmbd' : 0.5, 'tol' : 1e-1}]
-    params['time_of_retrieval'] = 10
+    params['rules'] = ['PseudoinverseNondiag']
+    params['options'] = [{}]
+    #{'activation_function' : 'linear', 'tol' : 1e-1, 'lmbd' : 0.5}
+    # params['options'] = [{'sc': True, 'incremental' : True, 'unlearning' : True, 'HN' : True, 'unlearn_rate' : 0.1, 'num_of_retrieval' : 10, 'sync' : True, 'time' : 10}]
+    params['time_of_retrieval'] = 50
     params['sync'] = True
     num_neurons = 50
     num_of_flips = 50 - 1
     num_of_patterns = 75
-    num_repetitions = 10
+    num_repetitions = 100
     flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitions, params)
