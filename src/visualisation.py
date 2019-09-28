@@ -37,8 +37,13 @@ def visualise_patterns(patterns, initial_state, retrieved_pattern):
     plt.show()
 
 
-def run_visualisation(options, flips = 10, sync = False, time = 50, pattern_num = 0, random_patterns = False ):
+def run_visualisation(options, flips = 10, pattern_num = 1, random_patterns = False ):
     n = 10
+    rule = options['rule']
+    learning_options = options['learning_options']
+    retrieval_options = options['retrieval_options']
+    time = retrieval_options['time_of_retrieval']
+    sync = retrieval_options['sync']
     num_neurons = n**2
     HN = Hopfield_network(num_neurons=num_neurons)
     patterns = [random_state(0.7,n**2) for i in range(4)]
@@ -61,14 +66,15 @@ def run_visualisation(options, flips = 10, sync = False, time = 50, pattern_num 
     letter_E[4:6,:] *= -1
     letter_E[8:,:] *= -1
     letter_E[:,0:2] = 1
+
     if random_patterns == False:
         patterns[0] = smile_positive.flatten()
         patterns[1] = smile_negative.flatten()
         patterns[2] = letter_T.flatten()
         patterns[3] = letter_E.flatten()
 
-    HN.learn_patterns(patterns, options=options)
-    pattern_r = deepcopy(introduce_random_flips(patterns[pattern_num], flips))
+    HN.learn_patterns(patterns, rule=rule, options=learning_options)
+    pattern_r = deepcopy(introduce_random_flips(patterns[pattern_num - 1], flips))
     retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, time, record=False)
     visualise_patterns(patterns, pattern_r, retrieved_pattern)
     return None
