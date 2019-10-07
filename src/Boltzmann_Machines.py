@@ -1,14 +1,55 @@
+from math_utils import *
+from Hopfield_Network import Hopfield_network
 import numpy as np
+from matplotlib import pyplot as plt
 from copy import deepcopy
 from scipy.optimize import minimize
-from utils import normalise_weights
 from scipy.sparse.linalg import lsqr
-from math_utils import *
-#utils
 
+################# BOLTZMANN MACHINE #################
+class Boltzmann_machine(Hopfield_network):
+    def __init__(self, num_neurons, T_max, T_decay):
+        super().__init__(num_neurons)
+        self.T = T_max
+        self.T_max = T_max
+        self.T_decay = T_decay
+
+    def update_state(self, sync=True):
+        if sync == True:
+            self.hidden_state = (self.weights @ self.state.reshape(-1, 1) + self.biases.reshape(-1, 1)).flatten()
+            h_tmp = sigmoid(self.hidden_state/self.T)
+            self.state = np.array([(1 if np.random.rand() < h_tmp[i] else -1) for i in range(len(h_tmp))])
+        elif sync == False:
+            for i in range(num_neurons):
+                self.hidden_state[i] = np.dot(self.weights[i, :], self.state)
+                self.state[i] = 1 if np.random.rand() < sigmoid(self.hidden_state[i] / self.T) else -1
+        else:
+            raise AttributeError('\'sync\' variable can take only boolean values')
+        return None
+
+    def retrieve_pattern(self, new_state, sync, time = None, record = False):
+        self.T = self.T_max
+        self.state = new_state
+        if record == True:
+            data = dict()
+            data['hidden_variables'] = []
+            data['state'] = []
+        while self.T > 0.0001:
+            self.update_state(sync)
+            self.T *= self.T_decay
+            if record == True:
+                data['hidden_variables'].append(deepcopy(self.hidden_state))
+                data['state'].append(deepcopy(self.state))
+        if record == True:
+            data['hidden_variables'] = np.array(data['hidden_variables']).T
+            data['state'] = np.array(data['state']).T
+            return self.state, data
+        else:
+            return self.state
+
+#LEARNING RULES
 
 def hebbian_lr(N, patterns, weights, biases, sc, incremental):
-    #, unlearning = False, HN = None,unlearn_rate = None, num_of_retrieval = None, sync = None, time = None
     weights = deepcopy(np.zeros((N, N)))
     if incremental == True:
         for i in range(patterns.shape[0]):
@@ -17,14 +58,6 @@ def hebbian_lr(N, patterns, weights, biases, sc, incremental):
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
             weights += Y
-            # if unlearning == True:
-            #     for r in range(num_of_retrieval):
-            #         retirieved_pattern = HN.retrieve_pattern(pattern, sync, time, record = False)
-            #         overlap = np.abs(np.dot(pattern.flatten(), retirieved_pattern) / N)
-            #         if overlap != 1.0:
-            #             Y = -unlearn_rate * (1 - overlap) * (retirieved_pattern @ retirieved_pattern.T - np.identity(N))
-            #             weights += Y
-            #             weights += (pattern @ pattern.T - np.identity(N))
     else:
         Z = deepcopy(patterns).T.reshape(N, -1)
         Y = Z @ Z.T
@@ -135,7 +168,6 @@ def descent_l1_with_solver(N, patterns, weights, biases, activation_function, to
         biases = deepcopy(res['x'][N ** 2 :].reshape(-1, 1))
     return weights, biases
 
-
 def find_chebyshev_centre(N, patterns, weights, biases, gamma):
     Z = deepcopy(patterns).T.reshape(N, -1)
     p = Z.shape[-1]
@@ -186,112 +218,32 @@ def descent_l2_norm(N, patterns, weights, biases, sc, incremental, symm, lmbd, n
     return weights, biases
 
 
-def descent_overlap(N, patterns, weights, biases, sc, incremental, symm, lmbd, num_it):
-    if incremental == True:
-        for i in range(patterns.shape[0]):
-            pattern = deepcopy(patterns[i]).reshape(-1, 1)
-            for j in range(num_it):
-                lf = weights @ pattern + biases.reshape(-1, 1)
-                A = -(lmbd * (1 - (np.tanh(lmbd * lf)**2)) * pattern)
-                if symm == False:
-                    Y = - A @ pattern.T
-                else:
-                    Y = - (A @ pattern.T + pattern @ A.T) / 2
-                delta_b = - A
-                if sc == False:
-                    Y[np.arange(N), np.arange(N)] = np.zeros(N)
-                weights += Y
-                biases += delta_b.flatten()
-    else:
-        Z = deepcopy(patterns).T.reshape(N, -1)
-        p = Z.shape[-1]
-        for j in range(num_it):
-            lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-            A = (lmbd * (1 - (np.tanh(lmbd * lf) ** 2)) * Z)
-            if symm == False:
-                Y = - (A @ Z.T)
-            else:
-                Y = - (A @ Z.T + Z @ A.T) / 2
-            delta_b = - np.mean(A, axis = 1)
-            if sc == False:
-                Y[np.arange(N), np.arange(N)] = np.zeros(N)
-            weights += Y
-            biases += delta_b.flatten()
-    return weights, biases
+if __name__ == '__main__':
+    num_neurons = 100
+    num_patterns = 5
+    sync = True
+    flips = 20
+    time = 100
+    rule = 'DescentL1Solver'
+    options = {'tol' : 1e-3, 'lmbd' : 0.5}#{'sc' : True, 'incremental' : True}#{}#
+    HN = Boltzmann_machine(num_neurons=num_neurons, T_max=10, T_decay=0.9)
+    patterns = [random_state(p=0.5, n=num_neurons, values=[-1, 1]) for i in range(num_patterns)]
+    HN.learn_patterns(patterns, rule, options)
+    pattern_r = introduce_random_flips(pattern=patterns[2], k=flips, values=[-1, 1])
 
-#
-# def descent_Hamming(N, patterns, weights, biases, options):
-#     lmbd = options['lambda']
-#     incremental = options['incremental']
-#     sc = options['sc']
-#     num_it = options['num_it']
-#     symm = options['symm']
-#     if incremental == True:
-#         for i in range(patterns.shape[0]):
-#             pattern = patterns[i].reshape(-1, 1)
-#             for j in range(num_it):
-#                 lf = weights @ pattern + biases.reshape(-1, 1)
-#                 A = (0.5 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * np.sign(np.tanh(lmbd * lf) - pattern)) / N
-#                 if symm == False:
-#                     Y = - A @ pattern.T
-#                 else:
-#                     Y = - (A @ pattern.T + pattern @ A.T) / 2
-#                 delta_b = - A
-#                 if sc == False:
-#                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
-#                 weights += Y
-#                 biases += delta_b.flatten()
-#     else:
-#         Z = patterns.T.reshape(N, -1)
-#         p = Z.shape[-1]
-#         for j in range(num_it):
-#             lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-#             A = (0.5 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * np.sign(np.tanh(lmbd * lf) - Z)) / N
-#             if symm == False:
-#                 Y = - (A @ Z.T)
-#             else:
-#                 Y = - (A @ Z.T + Z @ A.T) / 2
-#             delta_b = - np.mean(A, axis = 1)
-#             if sc == False:
-#                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
-#             weights += Y
-#             biases += delta_b.flatten()
-#     return weights, biases
-#
-# def descent_crossentropy(N, patterns, weights, biases, options):
-#     lmbd = options['lambda']
-#     incremental = options['incremental']
-#     sc = options['sc']
-#     num_it = options['num_it']
-#     symm = options['symm']
-#     if incremental == True:
-#         for i in range(patterns.shape[0]):
-#             pattern = patterns[i].reshape(-1, 1)
-#             for j in range(num_it):
-#                 lf = weights @ pattern + biases.reshape(-1, 1)
-#                 A = (lmbd * (1 - pattern*np.tanh(lf)))
-#                 if symm == False:
-#                     Y = - A @ pattern.T
-#                 else:
-#                     Y = - (A @ pattern.T + pattern @ A.T) / 2
-#                 delta_b = - A
-#                 if sc == False:
-#                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
-#                 weights += Y
-#                 biases += delta_b.flatten()
-#     else:
-#         Z = patterns.T.reshape(N, -1)
-#         p = Z.shape[-1]
-#         for j in range(num_it):
-#             lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-#             A = (lmbd * (1 - Z*np.tanh(lf)))
-#             if symm == False:
-#                 Y = - (A @ Z.T)
-#             else:
-#                 Y = - (A @ Z.T + Z @ A.T) / 2
-#             delta_b = - np.mean(A, axis = 1)
-#             if sc == False:
-#                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
-#             weights += Y
-#             biases += delta_b.flatten()
-#     return weights, biases
+    print('\nSimilarity with different patterns (before): ')
+    for i in range(len(patterns)):
+        print(np.linalg.norm(pattern_r - patterns[i], 2))
+
+    retrieved_pattern, data = HN.retrieve_pattern(pattern_r, sync, time, record = True)
+    print('\nSimilarity with different patterns (after): ')
+    for i in range(len(patterns)):
+        print(np.linalg.norm(retrieved_pattern - patterns[i], 2))
+
+    fig1 = plt.figure()
+    plt.plot(data['hidden_variables'].T)
+    plt.show()
+    fig3 = plt.figure()
+    similarities = np.array([[np.dot(data['state'][:,j],patterns[i])/num_neurons for i in range(len(patterns))] for j in range(time)])
+    plt.plot(similarities)
+    plt.show()
