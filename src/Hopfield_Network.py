@@ -43,8 +43,10 @@ class Hopfield_network():
             self.weights, self.biases = descent_l2_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL1Solver':
             self.weights, self.biases = descent_l1_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'ChebyshevCentre':
-            self.weights, self.biases = find_chebyshev_centre(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentCESolver':
+            self.weights, self.biases = descent_crossentropy_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentAnalyticalCentre':
+            self.weights, self.biases = descent_analytical_centre_with_solver(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'L2DifferenceMin':
             self.weights, self.biases = l2_difference_minimisation(self.num_neurons, patterns, self.weights, self.biases, **options)
         else:
@@ -82,16 +84,17 @@ class Hopfield_network():
 
 if __name__ == '__main__':
     num_neurons = 100
-    num_patterns = 20
+    num_patterns = 30
     sync = True
-    flips = 25
-    time = 20
-    rule = 'DescentL2Solver'
-    options = {'incremental' : True, 'tol' : 1e-3, 'lmbd' : 0.5}#{'gamma' : 0.001}#
+    flips = 20
+    time = 50
+    num = 2
+    rule = 'DescentAnalyticalCentre'
+    options = {'incremental' : True, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
     HN = Hopfield_network(num_neurons=num_neurons)
     patterns = [random_state(p=0.5, n=num_neurons, values=[-1, 1]) for i in range(num_patterns)]
     HN.learn_patterns(patterns, rule, options)
-    pattern_r = introduce_random_flips(pattern=patterns[1], k=flips, values=[-1, 1])
+    pattern_r = introduce_random_flips(pattern=patterns[num], k=flips, values=[-1, 1])
 
     print('\nSimilarity with different patterns (before): ')
     for i in range(len(patterns)):

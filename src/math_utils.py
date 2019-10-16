@@ -8,6 +8,9 @@ def sigmoid(x):
 def step(x):
     return np.round(sigmoid(x),0)
 
+def identity_function(x):
+    return x
+
 def random_state(p, n, values):
     state = []
     for i in range(n):
@@ -46,11 +49,6 @@ def chebyshev_centre(A, b, gamma):
     A_ = np.vstack([A_, -c.reshape(1, -1)])
     b_ = np.append(b, 100).reshape(-1, 1)
 
-    # # constructiong a variance matrix
-    # M = (np.eye(cols + 1) - 1/(cols))
-    # M[:,-1] = M[-1, :] = 0  #not taking r (the last element of decision-variables vector) into account
-    # P = gamma * (1 / cols) * M.T @ M
-
     # l2 norm minimisation of w
     P = gamma * np.eye(cols + 1)
     P[:, -1] = P[-1, :] = 0
@@ -75,9 +73,6 @@ def l1_minimisation(G, h): # l1 norm minimization of x, given inequality constra
     sol = solvers.lp(c, A, b)
     return sol['x'][:N]
 
-def identity_function(x):
-    return x
-
 def l2norm_difference(weights_and_biases, patterns, lmbd):
     Z = np.array(patterns)
     N = patterns.shape[0]
@@ -96,26 +91,6 @@ def l2norm_difference_jacobian(weights_and_biases, patterns, lmbd):
     h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
     grad_w = ((lmbd * h - Z) * lmbd) @ Z.T + Z @ ((lmbd * h - Z) * lmbd).T
     grad_b = np.sum(lmbd *(lmbd * h - Z), axis=-1)
-    return np.concatenate([grad_w.flatten(), grad_b.flatten()])
-
-def l2norm_difference_asymm(weights_and_biases, patterns, lmbd):
-    Z = np.array(patterns)
-    N = patterns.shape[0]
-    p = Z.shape[-1]
-    weights = weights_and_biases[:N ** 2].reshape(N, N)
-    biases = weights_and_biases[N ** 2:]
-    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)]) # N x p
-    return np.sum((lmbd * h + (1 / 2) - Z)**2)
-
-def l2norm_difference_asymm_jacobian(weights_and_biases, patterns, lmbd):
-    Z = np.array(patterns)
-    N = patterns.shape[0]
-    p = Z.shape[-1]
-    weights = weights_and_biases[:N ** 2].reshape(N, N)
-    biases = weights_and_biases[N ** 2:]
-    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-    grad_w = ((lmbd * h + 1 / 2 - Z) * lmbd) @ Z.T + Z @ ((lmbd * h + 1 / 2 - Z) * lmbd).T
-    grad_b = np.sum(lmbd *(lmbd * h + 1 / 2 - Z), axis=-1)
     return np.concatenate([grad_w.flatten(), grad_b.flatten()])
 
 def l1norm_difference(weights_and_biases, patterns, lmbd):
@@ -138,47 +113,66 @@ def l1norm_difference_jacobian(weights_and_biases, patterns, lmbd):
     grad_b = np.sum(lmbd * np.sign(lmbd * h - Z), axis=-1)
     return np.concatenate([grad_w.flatten(), grad_b.flatten()])
 
-def l1norm_difference_asymm(weights_and_biases, patterns, lmbd):
+def crossentropy(weights_and_biases, patterns, lmbd):
     Z = np.array(patterns)
     N = patterns.shape[0]
     p = Z.shape[-1]
     weights = weights_and_biases[:N ** 2].reshape(N, N)
     biases = weights_and_biases[N ** 2:]
     h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-    return np.sum(np.abs(lmbd * h + 1 / 2 - Z))
+    return np.sum( - ((1 + Z)/ 2) * np.log((1 + lmbd * h) / 2) - ((1 - Z) / 2) * np.log((1 - lmbd * h) / 2) )
 
-def l1norm_difference_asymm_jacobian(weights_and_biases, patterns, lmbd):
+def crossentropy_jacobian(weights_and_biases, patterns, lmbd):
     Z = np.array(patterns)
     N = patterns.shape[0]
     p = Z.shape[-1]
     weights = weights_and_biases[:N ** 2].reshape(N, N)
     biases = weights_and_biases[N ** 2:]
     h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-    grad_w = 0.5 * ( (np.sign(lmbd * h + 1 / 2 - Z) * lmbd) @ Z.T + Z @ (np.sign(lmbd * h + 1 / 2 - Z) * lmbd).T )
-    grad_b = np.sum(lmbd * np.sign(lmbd * h + 1 / 2 - Z), axis=-1)
+    grad_w = lmbd * ((lmbd * h - Z)/(1 - lmbd ** 2 * h ** 2)) @ Z.T
+    grad_b = np.sum(lmbd * ((lmbd * h - Z)/(1 - lmbd ** 2 * h ** 2)), axis=-1)
     return np.concatenate([grad_w.flatten(), grad_b.flatten()])
 
-def l2norm_difference_multi(weights_and_biases, patterns, lmbd, mu, alpha):
+def analytical_centre(weights_and_biases, patterns, lmbd, alpha):
     Z = np.array(patterns)
-    F = np.roll(deepcopy(Z), -1, axis = 0) # array of next patterns
     N = patterns.shape[0]
     p = Z.shape[-1]
     weights = weights_and_biases[:N ** 2].reshape(N, N)
     biases = weights_and_biases[N ** 2:]
-    H = weights @ Z
-    B = np.hstack([biases.reshape(-1, 1) for i in range(p)]) # N x p
-    return np.sum((lmbd * (H + B) + (1 / 2) - Z)**2) + mu * np.sum((lmbd * (alpha * H + B) + (1 / 2) - F)**2)
+    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
+    return np.sum(np.exp(-lmbd * Z * h)) + alpha*(np.sum(weights ** 2) + np.sum(biases ** 2))
 
-def l2norm_difference_multi_jacobian(weights_and_biases, patterns, lmbd, mu, alpha):
+def analytical_centre_jacobian(weights_and_biases, patterns, lmbd, alpha):
     Z = np.array(patterns)
-    F = np.roll(deepcopy(Z), -1, axis = 0) # array of next patterns
     N = patterns.shape[0]
     p = Z.shape[-1]
     weights = weights_and_biases[:N ** 2].reshape(N, N)
     biases = weights_and_biases[N ** 2:]
-    H = weights @ Z
-    B = np.hstack([biases.reshape(-1, 1) for i in range(p)])
-    grad_w = ((lmbd * (H + B) + 1 / 2 - Z) * lmbd) @ Z.T + Z @ ((lmbd * (H + B) + 1 / 2 - Z) * lmbd).T  \
-             + mu * ((lmbd * (alpha * H + B) + 1 / 2 - F) * lmbd) @ Z.T + mu * Z @ ((lmbd * (alpha * H + B) + 1 / 2 - F) * lmbd).T
-    grad_b = np.sum(lmbd *(lmbd * (H + B) + 1 / 2 - Z), axis=-1) + mu * np.sum(lmbd *(lmbd * (alpha * H + B) + 1 / 2 - F), axis=-1)
+    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
+    grad_w = -(lmbd * Z * np.exp(-lmbd * Z * h)) @ Z.T + 2 * alpha * weights
+    grad_b = -np.sum((lmbd * Z * np.exp(-lmbd * Z * h)), axis=-1) + 2 * alpha * biases
+    return np.concatenate([grad_w.flatten(), grad_b.flatten()])
+
+def analytical_centre_incremental(weights_and_biases, patterns, lmbd, alpha, weights_and_biases_initial):
+    Z = np.array(patterns)
+    N = patterns.shape[0]
+    p = Z.shape[-1]
+    weights = weights_and_biases[:N ** 2].reshape(N, N)
+    biases = weights_and_biases[N ** 2:]
+    weights_initial = weights_and_biases_initial[:N ** 2].reshape(N, N)
+    biases_initial = weights_and_biases_initial[N ** 2:]
+    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
+    return np.sum(np.exp(-lmbd * Z * h)) + alpha*(np.sum( (weights - weights_initial) ** 2) + np.sum( (biases - biases_initial) ** 2))
+
+def analytical_centre_incremental_jacobian(weights_and_biases, patterns, lmbd, alpha, weights_and_biases_initial):
+    Z = np.array(patterns)
+    N = patterns.shape[0]
+    p = Z.shape[-1]
+    weights = weights_and_biases[:N ** 2].reshape(N, N)
+    biases = weights_and_biases[N ** 2:]
+    weights_initial = weights_and_biases_initial[:N ** 2].reshape(N, N)
+    biases_initial = weights_and_biases_initial[N ** 2:]
+    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
+    grad_w = -(lmbd * Z * np.exp(-lmbd * Z * h)) @ Z.T + 2 * alpha * (weights - weights_initial)
+    grad_b = -np.sum((lmbd * Z * np.exp(-lmbd * Z * h)), axis=-1) + 2 * alpha * (biases - biases_initial)
     return np.concatenate([grad_w.flatten(), grad_b.flatten()])

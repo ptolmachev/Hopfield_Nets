@@ -8,7 +8,6 @@ from math_utils import *
 
 
 def hebbian_lr(N, patterns, weights, biases, sc, incremental):
-    #, unlearning = False, HN = None,unlearn_rate = None, num_of_retrieval = None, sync = None, time = None
     weights = deepcopy(np.zeros((N, N)))
     if incremental == True:
         for i in range(patterns.shape[0]):
@@ -17,14 +16,6 @@ def hebbian_lr(N, patterns, weights, biases, sc, incremental):
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
             weights += Y
-            # if unlearning == True:
-            #     for r in range(num_of_retrieval):
-            #         retirieved_pattern = HN.retrieve_pattern(pattern, sync, time, record = False)
-            #         overlap = np.abs(np.dot(pattern.flatten(), retirieved_pattern) / N)
-            #         if overlap != 1.0:
-            #             Y = -unlearn_rate * (1 - overlap) * (retirieved_pattern @ retirieved_pattern.T - np.identity(N))
-            #             weights += Y
-            #             weights += (pattern @ pattern.T - np.identity(N))
     else:
         Z = deepcopy(patterns).T.reshape(N, -1)
         Y = Z @ Z.T
@@ -34,12 +25,18 @@ def hebbian_lr(N, patterns, weights, biases, sc, incremental):
     return weights, biases
 
 def pseudoinverse(N, patterns, weights, biases):
+    '''
+    W = Z Z^+
+    '''
     Z = deepcopy(patterns).T.reshape(N, -1)
-    Y = N * (Z) @ np.linalg.pinv(Z)
+    Y = N * Z @ np.linalg.pinv(Z)
     weights = Y
     return weights, biases
 
 def l2_difference_minimisation(N, patterns, weights, biases, sc):
+    '''
+    minimisation of || lmbd* W @ Z - Z||
+    '''
     Z = deepcopy(patterns).T.reshape(N, -1)
     W = np.array([])
     for i in range(N):
@@ -61,6 +58,8 @@ def l2_difference_minimisation(N, patterns, weights, biases, sc):
     return weights, biases
 
 def storkey(N, patterns, weights, biases, sc, incremental, order):
+    '''
+    '''
     if incremental == True:
         for i in range(patterns.shape[0]):
             pattern = deepcopy(patterns[i]).reshape(-1, 1)
@@ -89,6 +88,9 @@ def storkey(N, patterns, weights, biases, sc, incremental, order):
     return weights, biases
 
 def storkey_normalised_lf(N, patterns, weights, biases, sc, incremental):
+    '''
+
+    '''
     if incremental == True:
         for i in range(patterns.shape[0]):
             pattern = deepcopy(patterns[i]).reshape(-1, 1)
@@ -135,6 +137,42 @@ def descent_l1_with_solver(N, patterns, weights, biases, activation_function, to
         biases = deepcopy(res['x'][N ** 2 :].reshape(-1, 1))
     return weights, biases
 
+def descent_crossentropy_with_solver(N, patterns, weights, biases, incremental, tol, lmbd):
+    if incremental:
+        for i in range(patterns.shape[0]):
+            pattern = np.array(deepcopy(patterns[i].reshape(-1, 1)))
+            x0 = np.concatenate([weights.flatten(), biases.flatten()])
+            res = minimize(crossentropy, x0, args=(pattern, lmbd), jac = crossentropy_jacobian, method='L-BFGS-B', tol=tol, options={'disp' : False})
+            weights = deepcopy(res['x'][: N ** 2].reshape(N, N))
+            biases = deepcopy(res['x'][N ** 2 :].reshape(-1, 1))
+    if incremental == False:
+        Z = deepcopy(patterns).T.reshape(N, -1)
+        x0 = np.concatenate([weights.flatten(), biases.flatten()])
+        res = minimize(crossentropy, x0, args=(Z, lmbd), jac=crossentropy_jacobian,
+                       method='L-BFGS-B', tol=tol, options={'disp': False})
+        weights = deepcopy(res['x'][: N ** 2].reshape(N, N))
+        biases = deepcopy(res['x'][N ** 2:].reshape(-1, 1))
+    return weights, biases
+
+def descent_analytical_centre_with_solver(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+    if incremental:
+        Z = deepcopy(patterns).T.reshape(N, -1)
+        for i in range(patterns.shape[0]):
+            pattern = np.array(deepcopy(patterns[i].reshape(-1, 1)))
+            x0 = np.concatenate([weights.flatten(), biases.flatten()])
+            res = minimize(analytical_centre_incremental, x0, args=(Z, lmbd, alpha, deepcopy(x0)),
+                           jac=analytical_centre_incremental_jacobian,
+                           method='L-BFGS-B', tol=tol, options={'disp': False})
+            weights = deepcopy(res['x'][: N ** 2].reshape(N, N))
+            biases = deepcopy(res['x'][N ** 2:].reshape(-1, 1))
+    else:
+        Z = deepcopy(patterns).T.reshape(N, -1)
+        x0 = np.concatenate([weights.flatten(), biases.flatten()])
+        res = minimize(analytical_centre, x0, args=(Z, lmbd, alpha, deepcopy(x0)), jac=analytical_centre_jacobian,
+                       method='L-BFGS-B', tol=tol, options={'disp': False})
+        weights = deepcopy(res['x'][: N ** 2].reshape(N, N))
+        biases = deepcopy(res['x'][N ** 2:].reshape(-1, 1))
+    return weights, biases
 
 def find_chebyshev_centre(N, patterns, weights, biases, gamma):
     Z = deepcopy(patterns).T.reshape(N, -1)
@@ -149,93 +187,20 @@ def find_chebyshev_centre(N, patterns, weights, biases, gamma):
     weights = W.reshape(N, N)
     return weights, biases
 
-def descent_l2_norm(N, patterns, weights, biases, sc, incremental, symm, lmbd, num_it):
-    if incremental == True:
-        for i in range(patterns.shape[0]):
-            # print(f'Learning pattern number {i}')
-            pattern = deepcopy(patterns[i].reshape(-1, 1))
-            A = pattern
-            # while np.linalg.norm(A, 2) >= tol:
-            for j in range(num_it):
-                lf = weights @ pattern + biases.reshape(-1,1)
-                A =  2 * lmbd * (np.tanh(lmbd * lf) - pattern) #(1 - (np.tanh(lmbd * lf)**2))
-                if symm == False:
-                    Y = - A @ pattern.T
-                else:
-                    Y = - (A @ pattern.T + pattern @ A.T)/2
-                delta_b = - A
-                if sc == False:
-                    Y[np.arange(N), np.arange(N)] = np.zeros(N)
-                weights += Y
-                biases += delta_b.flatten()
-    else:
-        Z = patterns.T.reshape(N, -1)
-        p = Z.shape[-1]
-        for j in range(num_it):
-            lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-            A = 2 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * (np.tanh(lmbd * lf) - Z)
-            if symm == False:
-                Y = - (A @ Z.T)
-            else:
-                Y = - (A @ Z.T + Z @ A.T) / 2
-            delta_b = - np.mean(A, axis = 1)
-            if sc == False:
-                Y[np.arange(N), np.arange(N)] = np.zeros(N)
-            weights += Y
-            biases += delta_b.flatten()
-    return weights, biases
-
-
-def descent_overlap(N, patterns, weights, biases, sc, incremental, symm, lmbd, num_it):
-    if incremental == True:
-        for i in range(patterns.shape[0]):
-            pattern = deepcopy(patterns[i]).reshape(-1, 1)
-            for j in range(num_it):
-                lf = weights @ pattern + biases.reshape(-1, 1)
-                A = -(lmbd * (1 - (np.tanh(lmbd * lf)**2)) * pattern)
-                if symm == False:
-                    Y = - A @ pattern.T
-                else:
-                    Y = - (A @ pattern.T + pattern @ A.T) / 2
-                delta_b = - A
-                if sc == False:
-                    Y[np.arange(N), np.arange(N)] = np.zeros(N)
-                weights += Y
-                biases += delta_b.flatten()
-    else:
-        Z = deepcopy(patterns).T.reshape(N, -1)
-        p = Z.shape[-1]
-        for j in range(num_it):
-            lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-            A = (lmbd * (1 - (np.tanh(lmbd * lf) ** 2)) * Z)
-            if symm == False:
-                Y = - (A @ Z.T)
-            else:
-                Y = - (A @ Z.T + Z @ A.T) / 2
-            delta_b = - np.mean(A, axis = 1)
-            if sc == False:
-                Y[np.arange(N), np.arange(N)] = np.zeros(N)
-            weights += Y
-            biases += delta_b.flatten()
-    return weights, biases
-
-#
-# def descent_Hamming(N, patterns, weights, biases, options):
-#     lmbd = options['lambda']
-#     incremental = options['incremental']
-#     sc = options['sc']
-#     num_it = options['num_it']
-#     symm = options['symm']
+# def descent_l2_norm(N, patterns, weights, biases, sc, incremental, symm, lmbd, num_it):
 #     if incremental == True:
 #         for i in range(patterns.shape[0]):
-#             pattern = patterns[i].reshape(-1, 1)
+#             # print(f'Learning pattern number {i}')
+#             pattern = deepcopy(patterns[i].reshape(-1, 1))
+#             A = pattern
+#             # while np.linalg.norm(A, 2) >= tol:
 #             for j in range(num_it):
-#                 lf = weights @ pattern + biases.reshape(-1, 1)
-#                 A = (0.5 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * np.sign(np.tanh(lmbd * lf) - pattern)) / N
+#                 lf = weights @ pattern + biases.reshape(-1,1)
+#                 A =  2 * lmbd * (lmbd * lf - pattern)
 #                 if symm == False:
 #                     Y = - A @ pattern.T
 #                 else:
-#                     Y = - (A @ pattern.T + pattern @ A.T) / 2
+#                     Y = - (A @ pattern.T + pattern @ A.T)/2
 #                 delta_b = - A
 #                 if sc == False:
 #                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
@@ -246,7 +211,7 @@ def descent_overlap(N, patterns, weights, biases, sc, incremental, symm, lmbd, n
 #         p = Z.shape[-1]
 #         for j in range(num_it):
 #             lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-#             A = (0.5 * lmbd * (1 - (np.tanh(lmbd * lf)**2)) * np.sign(np.tanh(lmbd * lf) - Z)) / N
+#             A = 2 * lmbd * (1 - (lmbd * lf)**2) * (lmbd * lf - Z)
 #             if symm == False:
 #                 Y = - (A @ Z.T)
 #             else:
@@ -258,40 +223,4 @@ def descent_overlap(N, patterns, weights, biases, sc, incremental, symm, lmbd, n
 #             biases += delta_b.flatten()
 #     return weights, biases
 #
-# def descent_crossentropy(N, patterns, weights, biases, options):
-#     lmbd = options['lambda']
-#     incremental = options['incremental']
-#     sc = options['sc']
-#     num_it = options['num_it']
-#     symm = options['symm']
-#     if incremental == True:
-#         for i in range(patterns.shape[0]):
-#             pattern = patterns[i].reshape(-1, 1)
-#             for j in range(num_it):
-#                 lf = weights @ pattern + biases.reshape(-1, 1)
-#                 A = (lmbd * (1 - pattern*np.tanh(lf)))
-#                 if symm == False:
-#                     Y = - A @ pattern.T
-#                 else:
-#                     Y = - (A @ pattern.T + pattern @ A.T) / 2
-#                 delta_b = - A
-#                 if sc == False:
-#                     Y[np.arange(N), np.arange(N)] = np.zeros(N)
-#                 weights += Y
-#                 biases += delta_b.flatten()
-#     else:
-#         Z = patterns.T.reshape(N, -1)
-#         p = Z.shape[-1]
-#         for j in range(num_it):
-#             lf = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-#             A = (lmbd * (1 - Z*np.tanh(lf)))
-#             if symm == False:
-#                 Y = - (A @ Z.T)
-#             else:
-#                 Y = - (A @ Z.T + Z @ A.T) / 2
-#             delta_b = - np.mean(A, axis = 1)
-#             if sc == False:
-#                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
-#             weights += Y
-#             biases += delta_b.flatten()
-#     return weights, biases
+

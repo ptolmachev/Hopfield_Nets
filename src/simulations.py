@@ -1,6 +1,6 @@
 import numpy as np
 import pickle
-from Hopfield_net import *
+from Hopfield_Network import *
 from utils import *
 from matplotlib import pyplot as plt
 from copy import deepcopy
@@ -19,7 +19,7 @@ def flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitio
         print(f'repetition number {r}')
         for n_p in range(1,num_of_patterns+1):
             print(f'learning {n_p} patterns')
-            patterns = deepcopy([random_state(0.5, num_neurons) for i in range(n_p)])
+            patterns = deepcopy([random_state(0.5, num_neurons, values=[-1, 1]) for i in range(n_p)])
 
             R = np.random.randn(num_neurons, num_neurons)
             R = (R + R.T) / 2
@@ -33,7 +33,7 @@ def flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitio
             for n_f in range(1, num_of_flips+1):
                 num = np.random.randint(len(patterns))
                 true_pattern = deepcopy(patterns[num])
-                pattern_r = deepcopy(introduce_random_flips(true_pattern, n_f))
+                pattern_r = deepcopy(introduce_random_flips(true_pattern, n_f, values = [-1, 1]))
                 retrieved_pattern = HN.retrieve_pattern(pattern_r, sync, time, record=False)
                 overlap = (1 / num_neurons) * np.dot(retrieved_pattern, true_pattern)
                 results[n_p - 1, n_f - 1, r] = overlap
@@ -65,8 +65,8 @@ def weights_distribution_plot(num_neurons, num_of_patterns, params):
 
 if __name__ == '__main__':                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     params = dict()
-    params['rule'] = 'DescentL2Solver'
-    params['learning_options'] = {'sc' : False, 'incremental' : True}#{'activation_function' : 'linear', 'tol' : 1e-3, 'lmbd' : 0.5}#
+    params['rule'] = 'DescentAnalyticalCentre'
+    params['learning_options'] = {'incremental' : True, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
     params['retrieval_options'] = {'time_of_retrieval' : 50, 'sync' : True}
     # params['learning_options'] = {}
     # params['options'] = [{'sc': True, 'incremental' : True, 'unlearning' : True, 'HN' : True, 'unlearn_rate' : 0.1, 'num_of_retrieval' : 10, 'sync' : True, 'time' : 10}]
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     num_of_flips = 100 - 1
     num_of_patterns = 150
     num_repetitions = 100
-    # flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitions, params)
-    for i in range(1,150):
-        print(i)
-        weights_distribution_plot(100, i, params)
+    flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitions, params)
+    # for i in range(1,150):
+    #     print(i)
+    #     weights_distribution_plot(100, i, params)

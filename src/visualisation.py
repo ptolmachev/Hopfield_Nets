@@ -129,9 +129,9 @@ def flips_and_patterns_3d(file_name):
 
 
 if __name__ == '__main__':
-    rule = 'L2DifferenceMin'
+    rule = 'DescentAnalyticalCentre'
     # arguments = {'sc': True, 'incremental' : True, 'unlearning' : True, 'HN' : True, 'unlearn_rate' : 0.1, 'num_of_retrieval' : 10, 'sync' : True, 'time' : 10}
-    arguments = {'sc' : False}
+    arguments =  {'incremental' : True, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
     # arguments = {'gamma' : 100}
     num_neurons = 100
     num_of_patterns = 150
