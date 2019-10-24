@@ -73,27 +73,8 @@ def l1_minimisation(G, h): # l1 norm minimization of x, given inequality constra
     sol = solvers.lp(c, A, b)
     return sol['x'][:N]
 
-def l2norm_difference(weights_and_biases, patterns, lmbd):
-    Z = np.array(patterns)
-    N = patterns.shape[0]
-    p = Z.shape[-1]
-    weights = weights_and_biases[:N ** 2].reshape(N, N)
-    biases = weights_and_biases[N ** 2:]
-    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-    return np.sum((lmbd * h - Z)**2)
-
-def l2norm_difference_jacobian(weights_and_biases, patterns, lmbd):
-    Z = np.array(patterns)
-    N = patterns.shape[0]
-    p = Z.shape[-1]
-    weights = weights_and_biases[:N ** 2].reshape(N, N)
-    biases = weights_and_biases[N ** 2:]
-    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-    grad_w = ((lmbd * h - Z) * lmbd) @ Z.T + Z @ ((lmbd * h - Z) * lmbd).T
-    grad_b = np.sum(lmbd *(lmbd * h - Z), axis=-1)
-    return np.concatenate([grad_w.flatten(), grad_b.flatten()])
-
-def l2norm_difference_(weights_and_bias, patterns, i, lmbd, alpha):
+### L2 NORM ###
+def l2norm_difference(weights_and_bias, patterns, i, lmbd, alpha):
     Z = np.array(patterns).T
     p = Z.shape[-1]
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
@@ -101,16 +82,16 @@ def l2norm_difference_(weights_and_bias, patterns, i, lmbd, alpha):
     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
     return (1 / 2) * np.sum((lmbd * h - Z[i, :])**2) + (alpha / 2) * np.sum(weights_and_bias ** 2)
 
-def l2norm_difference_jacobian_(weights_and_bias, patterns, i, lmbd, alpha):
+def l2norm_difference_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
     Z = np.array(patterns).T
     p = Z.shape[-1]
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
     Z_ = np.vstack([Z, np.ones(p)])
     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-    grad_w_b = ((lmbd * h - Z[i, :]) * lmbd) @ Z_.T + alpha * np.sum(weights_and_bias)
+    grad_w_b = ((lmbd * h - Z[i, :]) * lmbd) @ Z_.T + alpha * weights_and_bias
     return grad_w_b
 
-def l2norm_difference_hessian_(weights_and_bias, patterns, i, lmbd, alpha):
+def l2norm_difference_hessian(weights_and_bias, patterns, i, lmbd, alpha):
     Z = np.array(patterns).T
     N = Z.shape[0]
     p = Z.shape[-1]
@@ -119,26 +100,26 @@ def l2norm_difference_hessian_(weights_and_bias, patterns, i, lmbd, alpha):
     H = alpha * np.eye(N + 1) + lmbd**2 * Z_ @ Z_.T
     return H
 
-def l1norm_difference(weights_and_biases, patterns, lmbd):
-    Z = np.array(patterns)
-    N = patterns.shape[0]
-    p = Z.shape[-1]
-    weights = weights_and_biases[:N ** 2].reshape(N, N)
-    biases = weights_and_biases[N ** 2:]
-    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-    return np.sum(np.abs(lmbd * h - Z))
+### L1 NORM ###
 
-def l1norm_difference_jacobian(weights_and_biases, patterns, lmbd):
-    Z = np.array(patterns)
-    N = patterns.shape[0]
+def l1norm_difference(weights_and_bias, patterns, i, lmbd, alpha):
+    Z = np.array(patterns).T
     p = Z.shape[-1]
-    weights = weights_and_biases[:N ** 2].reshape(N, N)
-    biases = weights_and_biases[N ** 2:]
-    h = weights @ Z + np.hstack([biases.reshape(-1, 1) for i in range(p)])
-    grad_w = 0.5 * ( (np.sign(lmbd * h - Z) * lmbd) @ Z.T + Z @ (np.sign(lmbd * h - Z) * lmbd).T )
-    grad_b = np.sum(lmbd * np.sign(lmbd * h - Z), axis=-1)
-    return np.concatenate([grad_w.flatten(), grad_b.flatten()])
+    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+    Z_ = np.vstack([Z, np.ones(p)])
+    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+    return np.sum(np.abs(lmbd * h - Z[i, :])) + (alpha / 2) * np.sum(weights_and_bias ** 2)
 
+def l1norm_difference_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
+    Z = np.array(patterns).T
+    p = Z.shape[-1]
+    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+    Z_ = np.vstack([Z, np.ones(p)])
+    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+    grad_w_b = (np.sign(lmbd * h - Z[i, :]) * lmbd) @ Z_.T + alpha * weights_and_bias
+    return grad_w_b
+
+### CROSSENTROPY
 def crossentropy(weights_and_biases, patterns, lmbd):
     Z = np.array(patterns)
     N = patterns.shape[0]
@@ -159,6 +140,7 @@ def crossentropy_jacobian(weights_and_biases, patterns, lmbd):
     grad_b = np.sum(lmbd * ((lmbd * h - Z)/(1 - lmbd ** 2 * h ** 2)), axis=-1)
     return np.concatenate([grad_w.flatten(), grad_b.flatten()])
 
+#BARRIER
 def analytical_centre(weights_and_biases, patterns, lmbd, alpha):
     Z = np.array(patterns)
     N = patterns.shape[0]

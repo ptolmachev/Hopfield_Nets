@@ -40,7 +40,7 @@ class Hopfield_network():
         elif rule == 'StorkeyNormalisedLF':
             self.weights, self.biases = storkey_normalised_lf(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL2Newton':
-            self.weights, self.biases = descent_l2_newton_(self.num_neurons, patterns, self.weights, self.biases, **options)
+            self.weights, self.biases = descent_l2_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL1Newton':
             self.weights, self.biases = descent_l1_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentCENewton':
@@ -78,7 +78,6 @@ class Hopfield_network():
         else:
             return self.state
 
-
 if __name__ == '__main__':
     num_neurons = 100
     num_patterns = 20
@@ -86,8 +85,10 @@ if __name__ == '__main__':
     flips = 20
     time = 30
     num = 2
-    rule = 'DescentL2Newton'
-    options = {'incremental' : True, 'tol' : 1e-4, 'lmbd' : 0.5, 'alpha' : 0.00001}
+    rule = 'DescentL1Newton'
+    options = {'incremental' : True, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
+    # rule = 'Pseudoinverse'
+    # options = {}
     HN = Hopfield_network(num_neurons=num_neurons)
     patterns = [random_state(p=0.5, n=num_neurons, values=[-1, 1]) for i in range(num_patterns)]
     HN.learn_patterns(patterns, rule, options)

@@ -117,7 +117,7 @@ def storkey_normalised_lf(N, patterns, weights, biases, sc, incremental):
         weights += Y
     return weights, biases
 
-def descent_l2_newton_(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_l2_newton(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} (lmbd h_i^k sigma_i^k - sigma_i^k)^2
     '''
@@ -128,7 +128,9 @@ def descent_l2_newton_(N, patterns, weights, biases, incremental, tol, lmbd, alp
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
-                res = minimize(l2norm_difference_, x0, args=(pattern, i, lmbd, alpha), jac = l2norm_difference_jacobian_, hess=l2norm_difference_hessian_, method='Newton-CG', tol=tol, options={'disp' : False})
+                res = minimize(l2norm_difference, x0, args=(pattern, i, lmbd, alpha),
+                               jac = l2norm_difference_jacobian, hess=l2norm_difference_hessian,
+                               method='Newton-CG', tol=tol, options={'disp' : False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] =  deepcopy(res['x'][-1])
     if incremental == False:
@@ -137,38 +139,40 @@ def descent_l2_newton_(N, patterns, weights, biases, incremental, tol, lmbd, alp
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
-            res = minimize(l2norm_difference_, x0, args=(patterns, i, lmbd, alpha), jac = l2norm_difference_jacobian_, hess=l2norm_difference_hessian_, method='Newton-CG', tol=tol, options={'disp' : False})
+            res = minimize(l2norm_difference, x0, args=(patterns, i, lmbd, alpha),
+                           jac = l2norm_difference_jacobian, hess=l2norm_difference_hessian,
+                           method='Newton-CG', tol=tol, options={'disp' : False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] =  deepcopy(res['x'][-1])
     return weights, biases
 
-def descent_l2_newton(N, patterns, weights, biases, incremental, tol, lmbd):
+def descent_l1_newton(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
     '''
-    Newton's method for
+    Newton's method for minimising \sum_{k = 1}^{p} abs(lmbd h_i^k sigma_i^k - sigma_i^k)
     '''
     if incremental:
-        for i in range(patterns.shape[0]):
-            pattern = np.array(deepcopy(patterns[i].reshape(-1, 1)))
-            x0 = np.concatenate([weights.flatten(), biases.flatten()])
-            res = minimize(l2norm_difference, x0, args=(pattern, lmbd), jac = l2norm_difference_jacobian, method='L-BFGS-B', tol=tol, options={'disp' : False})
-            weights = deepcopy(res['x'][: N ** 2].reshape(N, N))
-            biases = deepcopy(res['x'][N ** 2 :].reshape(-1, 1))
+        for i in range(N): #for each neuron independently
+            for j in range(patterns.shape[0]):
+                pattern = np.array(deepcopy(patterns[j].reshape(1, N)))
+                w_i = weights[i, :]
+                b_i = biases[i]
+                x0 = np.append(w_i, b_i)
+                res = minimize(l1norm_difference, x0, args=(pattern, i, lmbd, alpha),
+                               jac = l1norm_difference_jacobian,
+                               method='L-BFGS-B', tol=tol, options={'disp' : False})
+                weights[i, :] = deepcopy(res['x'][:-1])
+                biases[i] =  deepcopy(res['x'][-1])
     if incremental == False:
-        Z = deepcopy(patterns).T.reshape(N, -1)
-        x0 = np.concatenate([weights.flatten(), biases.flatten()])
-        res = minimize(l2norm_difference, x0, args=(Z, lmbd), jac=l2norm_difference_jacobian,
-                       method='L-BFGS-B', tol=tol, options={'disp': False})
-        weights = deepcopy(res['x'][: N ** 2].reshape(N, N))
-        biases = deepcopy(res['x'][N ** 2:].reshape(-1, 1))
-    return weights, biases
-
-def descent_l1_newton(N, patterns, weights, biases, activation_function, tol, lmbd):
-    for i in range(patterns.shape[0]):
-        pattern = deepcopy(patterns[i].reshape(-1, 1))
-        x0 = np.concatenate([weights.flatten(), biases.flatten()])
-        res = minimize(l1norm_difference, x0, args=(pattern, activation_function, lmbd), jac = l1norm_difference_jacobian, method='L-BFGS-B', tol=tol)
-        weights = deepcopy(res['x'][: N ** 2].reshape(N, N))
-        biases = deepcopy(res['x'][N ** 2 :].reshape(-1, 1))
+        patterns = np.array(deepcopy(patterns.reshape(-1, N)))
+        for i in range(N): #for each neuron independently
+            w_i = weights[i, :]
+            b_i = biases[i]
+            x0 = np.append(w_i, b_i)
+            res = minimize(l1norm_difference, x0, args=(patterns, i, lmbd, alpha),
+                           jac = l1norm_difference_jacobian,
+                           method='L-BFGS-B', tol=tol, options={'disp' : False})
+            weights[i, :] = deepcopy(res['x'][:-1])
+            biases[i] =  deepcopy(res['x'][-1])
     return weights, biases
 
 def descent_crossentropy_newton(N, patterns, weights, biases, incremental, tol, lmbd):
