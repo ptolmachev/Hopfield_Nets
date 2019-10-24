@@ -80,13 +80,13 @@ class Hopfield_network():
 
 if __name__ == '__main__':
     num_neurons = 100
-    num_patterns = 20
+    num_patterns = 30
     sync = False
     flips = 20
     time = 30
     num = 2
-    rule = 'DescentL1Newton'
-    options = {'incremental' : True, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
+    rule = 'DescentAnalyticalCentre'
+    options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
     # rule = 'Pseudoinverse'
     # options = {}
     HN = Hopfield_network(num_neurons=num_neurons)
