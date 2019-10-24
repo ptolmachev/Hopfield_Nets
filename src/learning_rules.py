@@ -128,7 +128,7 @@ def descent_l2_newton_(N, patterns, weights, biases, incremental, tol, lmbd, alp
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
-                res = minimize(l2norm_difference_, x0, args=(pattern, i, lmbd, alpha), jac = l2norm_difference_jacobian_, method='L-BFGS-B', tol=tol, options={'disp' : False})
+                res = minimize(l2norm_difference_, x0, args=(pattern, i, lmbd, alpha), jac = l2norm_difference_jacobian_, hess=l2norm_difference_hessian_, method='Newton-CG', tol=tol, options={'disp' : False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] =  deepcopy(res['x'][-1])
     if incremental == False:
@@ -137,7 +137,7 @@ def descent_l2_newton_(N, patterns, weights, biases, incremental, tol, lmbd, alp
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
-            res = minimize(l2norm_difference_, x0, args=(patterns, i, lmbd, alpha), jac = l2norm_difference_jacobian_, method='L-BFGS-B', tol=tol, options={'disp' : False})
+            res = minimize(l2norm_difference_, x0, args=(patterns, i, lmbd, alpha), jac = l2norm_difference_jacobian_, hess=l2norm_difference_hessian_, method='Newton-CG', tol=tol, options={'disp' : False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] =  deepcopy(res['x'][-1])
     return weights, biases

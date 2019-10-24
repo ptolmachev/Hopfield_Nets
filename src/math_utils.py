@@ -98,17 +98,26 @@ def l2norm_difference_(weights_and_bias, patterns, i, lmbd, alpha):
     p = Z.shape[-1]
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
     Z_ = np.vstack([Z, np.ones(p)])
-    h = weights_and_bias.reshape(1, -1) @ Z_ # vector of length p
-    return np.sum((lmbd * h - Z[i, :])**2) + (alpha / 2) * np.sum(weights_and_bias ** 2)
+    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+    return (1 / 2) * np.sum((lmbd * h - Z[i, :])**2) + (alpha / 2) * np.sum(weights_and_bias ** 2)
 
 def l2norm_difference_jacobian_(weights_and_bias, patterns, i, lmbd, alpha):
     Z = np.array(patterns).T
     p = Z.shape[-1]
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
     Z_ = np.vstack([Z, np.ones(p)])
-    h = weights_and_bias.reshape(1, -1) @ Z_ # vector of length p
-    grad_w_b = (2 * (lmbd * h - Z[i, :]) * lmbd) @ Z_.T + alpha * np.sum(weights_and_bias)
+    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+    grad_w_b = ((lmbd * h - Z[i, :]) * lmbd) @ Z_.T + alpha * np.sum(weights_and_bias)
     return grad_w_b
+
+def l2norm_difference_hessian_(weights_and_bias, patterns, i, lmbd, alpha):
+    Z = np.array(patterns).T
+    N = Z.shape[0]
+    p = Z.shape[-1]
+    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+    Z_ = np.vstack([Z, np.ones(p)])
+    H = alpha * np.eye(N + 1) + lmbd**2 * Z_ @ Z_.T
+    return H
 
 def l1norm_difference(weights_and_biases, patterns, lmbd):
     Z = np.array(patterns)

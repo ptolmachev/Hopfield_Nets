@@ -82,12 +82,12 @@ class Hopfield_network():
 if __name__ == '__main__':
     num_neurons = 100
     num_patterns = 20
-    sync = True
+    sync = False
     flips = 20
-    time = 50
+    time = 30
     num = 2
     rule = 'DescentL2Newton'
-    options = {'incremental' : True, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.00001}
+    options = {'incremental' : True, 'tol' : 1e-4, 'lmbd' : 0.5, 'alpha' : 0.00001}
     HN = Hopfield_network(num_neurons=num_neurons)
     patterns = [random_state(p=0.5, n=num_neurons, values=[-1, 1]) for i in range(num_patterns)]
     HN.learn_patterns(patterns, rule, options)
