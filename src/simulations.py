@@ -65,8 +65,8 @@ def weights_distribution_plot(num_neurons, num_of_patterns, params):
 
 if __name__ == '__main__':                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     params = dict()
-    params['rule'] = 'DescentAnalyticalCentre'
-    params['learning_options'] = {'incremental' : True, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
+    params['rule'] = 'DescentCENewton'
+    params['learning_options'] = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
     params['retrieval_options'] = {'time_of_retrieval' : 50, 'sync' : True}
     # params['learning_options'] = {}
     # params['options'] = [{'sc': True, 'incremental' : True, 'unlearning' : True, 'HN' : True, 'unlearn_rate' : 0.1, 'num_of_retrieval' : 10, 'sync' : True, 'time' : 10}]

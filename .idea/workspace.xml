@@ -6,6 +6,8 @@
       <change beforePath="$PROJECT_DIR$/src/Hopfield_Network.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield_Network.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/learning_rules.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/learning_rules.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/math_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/math_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/visualisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/visualisation.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -156,10 +158,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.Hopfield_net" />
-        <item itemvalue="Python.math_utils" />
-        <item itemvalue="Python.visualisation" />
-        <item itemvalue="Python.simulations" />
         <item itemvalue="Python.learning_rules" />
+        <item itemvalue="Python.simulations" />
+        <item itemvalue="Python.visualisation" />
+        <item itemvalue="Python.math_utils" />
       </list>
     </recent_temporary>
   </component>
@@ -238,7 +240,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/learning_rules.py</url>
-          <line>244</line>
+          <line>342</line>
           <option name="timeStamp" value="124" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -270,6 +272,21 @@
           <url>file://$PROJECT_DIR$/src/math_utils.py</url>
           <line>83</line>
           <option name="timeStamp" value="201" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/math_utils.py</url>
+          <line>151</line>
+          <option name="timeStamp" value="202" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/learning_rules.py</url>
+          <line>291</line>
+          <option name="timeStamp" value="217" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/learning_rules.py</url>
+          <line>319</line>
+          <option name="timeStamp" value="220" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

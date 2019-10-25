@@ -47,6 +47,14 @@ class Hopfield_network():
             self.weights, self.biases = descent_crossentropy_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentAnalyticalCentre':
             self.weights, self.biases = descent_analytical_centre_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DO_I':
+            self.weights, self.biases = DO_I(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DO_II':
+            self.weights, self.biases = DO_II(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'Krauth_Mezard':
+            self.weights, self.biases = Krauth_Mezard(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'Gardner':
+            self.weights, self.biases = Gardner(self.num_neurons, patterns, self.weights, self.biases, **options)
         else:
             raise ValueError('the specified learning rule is not implemented')
         return None
@@ -80,15 +88,29 @@ class Hopfield_network():
 
 if __name__ == '__main__':
     num_neurons = 100
-    num_patterns = 30
+    num_patterns = 20
     sync = False
     flips = 20
     time = 30
     num = 2
-    rule = 'DescentAnalyticalCentre'
-    options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
+
+    rule = 'Gardner'
+    options = {'lmbd': 0.01, 'k' : 1, 'max_iter' : 100}
+
+    # rule = 'Krauth_Mezard'
+    # options = {'lmbd': 0.01, 'max_iter' : 100}
+
+    # rule = 'DO_II'
+    # options = {'lmbd': 0.01, 'tol' : 1e-4}
+
+    # rule = 'DO_I'
+    # options = {'lmbd': 0.01}
+
+    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
+
     # rule = 'Pseudoinverse'
     # options = {}
+
     HN = Hopfield_network(num_neurons=num_neurons)
     patterns = [random_state(p=0.5, n=num_neurons, values=[-1, 1]) for i in range(num_patterns)]
     HN.learn_patterns(patterns, rule, options)

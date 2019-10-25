@@ -141,16 +141,16 @@ def crossentropy_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
     return grad_w_b
 
 # ADD HESSIAN FOR CROSSENTROPY
-# def crossentropy_hessian(weights_and_bias, patterns, i, lmbd, alpha):
-#     Z = np.array(patterns).T
-#     p = Z.shape[-1]
-#     p = Z.shape[0]
-#     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-#     Z_ = np.vstack([Z, np.ones(p)])
-#     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-#     grad_w_b = lmbd * ((lmbd * h - Z[i, :]) / (1 - lmbd ** 2 * h ** 2)) @ Z_.T + alpha * weights_and_bias
-#     H = alpha * np.eye(N + 1) + lmbd * (Z[i, :] @ Z_.T) / (1 - lmbd ** 2 * h ** 2) + lmbd * ((lmbd * h - Z[i, :]) / (1 - lmbd ** 2 * h ** 2))**2 @ Z_.T
-#     return H
+def crossentropy_hessian(weights_and_bias, patterns, i, lmbd, alpha):
+    Z = np.array(patterns).T
+    p = Z.shape[-1]
+    N = Z.shape[0]
+    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+    Z_ = np.vstack([Z, np.ones(p)])
+    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+    grad_w_b = lmbd * ((lmbd * h - Z[i, :]) / (1 - lmbd ** 2 * h ** 2)) @ Z_.T + alpha * weights_and_bias
+    H = alpha * np.eye(N + 1) + lmbd * (Z[i, :]/(1 - lmbd ** 2 * h ** 2) @ Z_.T) - lmbd**3 * (((lmbd * h - Z[i, :]) * h/(1 - lmbd ** 2 * h ** 2))**2) @ Z_.T
+    return H
 
 ### EXPONENTIAL BARRIER ###
 
