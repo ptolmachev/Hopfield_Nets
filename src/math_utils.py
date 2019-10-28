@@ -180,3 +180,38 @@ def analytical_centre_hessian(weights_and_bias, patterns, i, lmbd, alpha):
     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
     H = alpha * np.eye(N + 1) + (lmbd**2 * np.exp(-lmbd * Z[i, :] * h)) * Z_ @ Z_.T
     return H
+
+### NORMALISED OVERLAP ###
+
+def normalised_overlap(weights_and_bias, patterns, i, lmbd, alpha):
+    Z = np.array(patterns).T
+    p = Z.shape[-1]
+    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+    Z_ = np.vstack([Z, np.ones(p)])
+    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+    # return -np.sum((lmbd * h * Z[i, :]))/np.sum(np.abs(weights_and_bias)) + (alpha / 2) * np.sum(weights_and_bias ** 2)
+    return -np.sum((lmbd * h * Z[i, :]))/np.linalg.norm(weights_and_bias) + (alpha / 2) * np.sum(weights_and_bias ** 2)
+
+def normalised_overlap_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
+    Z = np.array(patterns).T
+    p = Z.shape[-1]
+    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+    Z_ = np.vstack([Z, np.ones(p)])
+    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+    term1 = -np.sum(lmbd * Z_ * Z[i, :], axis=1) / np.linalg.norm(weights_and_bias)
+    term2 = np.sum((lmbd * h * Z[i, :])) * weights_and_bias / (np.linalg.norm(weights_and_bias))**3
+    term3 = alpha * weights_and_bias
+    # term1 = -np.sum(lmbd * Z_ * Z[i, :], axis=1) / np.sum(np.abs(weights_and_bias))
+    # term2 = np.sum((lmbd * h * Z[i, :])) * np.sign(weights_and_bias) / np.sum(np.abs(weights_and_bias))**2
+    # term3 = alpha * weights_and_bias
+    grad_w_b = term1 + term2 + term3
+    return grad_w_b
+
+# def normalised_overlap_hessian(weights_and_bias, patterns, i, lmbd, alpha):
+#     Z = np.array(patterns).T
+#     N = Z.shape[0]
+#     p = Z.shape[-1]
+#     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+#     Z_ = np.vstack([Z, np.ones(p)])
+#     H = alpha * np.eye(N + 1) + lmbd**2 * Z_ @ Z_.T
+#     return H

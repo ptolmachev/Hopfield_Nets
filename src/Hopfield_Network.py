@@ -47,14 +47,16 @@ class Hopfield_network():
             self.weights, self.biases = descent_crossentropy_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentAnalyticalCentre':
             self.weights, self.biases = descent_analytical_centre_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DO_I':
-            self.weights, self.biases = DO_I(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DO_II':
-            self.weights, self.biases = DO_II(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'Krauth_Mezard':
+        elif rule == 'DiederichOpperII':
+            self.weights, self.biases = DiederichOpper_I(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DiederichOpperIII':
+            self.weights, self.biases = DiederichOpper_II(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'KrauthMezard':
             self.weights, self.biases = Krauth_Mezard(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'Gardner':
             self.weights, self.biases = Gardner(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'GardnerNewton':
+            self.weights, self.biases = Gardner_Newton(self.num_neurons, patterns, self.weights, self.biases, **options)
         else:
             raise ValueError('the specified learning rule is not implemented')
         return None
@@ -88,28 +90,37 @@ class Hopfield_network():
 
 if __name__ == '__main__':
     num_neurons = 100
-    num_patterns = 20
+    num_patterns = 25
     sync = False
-    flips = 20
+    flips = 30
     time = 30
     num = 2
+    # rule = 'GardnerNewton'
+    # options = {'incremental' : False, 'lmbd': 0.5, 'tol' : 1e-3, 'alpha' : 0.001}
 
     rule = 'Gardner'
-    options = {'lmbd': 0.01, 'k' : 1, 'max_iter' : 100}
+    options = {'lmbd': 1e-2, 'k' : 1.0, 'max_iter' : 200}
 
-    # rule = 'Krauth_Mezard'
+    # rule = 'KrauthMezard'
     # options = {'lmbd': 0.01, 'max_iter' : 100}
 
-    # rule = 'DO_II'
+    # rule = 'DiederichOpperI'
     # options = {'lmbd': 0.01, 'tol' : 1e-4}
 
-    # rule = 'DO_I'
+    # rule = 'DiederichOpperII'
     # options = {'lmbd': 0.01}
+    #
+    # rule = 'DescentAnalyticalCentre'
+    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}
 
-    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
-
+    # rule = 'DescentAnalyticalCentre'
+    # options = {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01}
+    #
     # rule = 'Pseudoinverse'
     # options = {}
+
+    # rule = 'DescentCENewton'
+    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
 
     HN = Hopfield_network(num_neurons=num_neurons)
     patterns = [random_state(p=0.5, n=num_neurons, values=[-1, 1]) for i in range(num_patterns)]

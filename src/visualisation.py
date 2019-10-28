@@ -11,6 +11,7 @@ from copy import deepcopy
 import pickle
 import pandas as pd
 from matplotlib import cm
+
 from mpl_toolkits.mplot3d.axes3d import get_test_data
 # This import registers the 3D projection, but is otherwise unused.
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
@@ -129,13 +130,15 @@ def flips_and_patterns_3d(file_name):
 
 
 if __name__ == '__main__':
-    rule = 'DescentL1Newton'
+    rule = 'DescentAnalyticalCentre'
+    arguments = {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01}
     # arguments = {'sc': True, 'incremental' : True, 'unlearning' : True, 'HN' : True, 'unlearn_rate' : 0.1, 'num_of_retrieval' : 10, 'sync' : True, 'time' : 10}
-    arguments =  {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
+    # arguments =  {'lmbd' : 0.001}#{'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
     # arguments = {'gamma' : 100}
     num_neurons = 100
     num_of_patterns = 150
     num_repetitions = 100
     file_name = f'../data/flips_and_patterns_{get_postfix(rule, arguments, num_neurons, num_of_patterns, num_repetitions)}.pkl'
+    # get_bound(file_name, 0.95)
     flips_and_patterns_contour_plot(file_name)
     # flips_and_patterns_contour_plot('../data/flips_and_patterns_DescentL2Symm_sc_75.pkl')

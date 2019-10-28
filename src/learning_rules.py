@@ -234,7 +234,7 @@ def descent_analytical_centre_newton(N, patterns, weights, biases, incremental, 
             biases[i] = deepcopy(res['x'][-1])
     return weights, biases
 
-def DO_I(N, patterns, weights, biases, lmbd):
+def DiederichOpper_I(N, patterns, weights, biases, lmbd):
     '''
     rule I described in Diederich and Opper in (1987) Learning of Correlated Patterns in Spin-Glass Networks by Local Learning Rules
     '''
@@ -249,7 +249,7 @@ def DO_I(N, patterns, weights, biases, lmbd):
                 h_i = (weights[i, :] @ pattern.T + biases[i])
     return weights, biases
 
-def DO_II(N, patterns, weights, biases, lmbd, tol):
+def DiederichOpper_II(N, patterns, weights, biases, lmbd, tol):
     '''
     rule II described in Diederich and Opper in (1987) Learning of Correlated Patterns in Spin-Glass Networks by Local Learning Rules
     '''
@@ -271,67 +271,119 @@ def Krauth_Mezard(N, patterns, weights, biases, lmbd, max_iter):
     '''
     Z = np.array(patterns).T
     M = 0
-    lf_adjustment_global = (weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])) * Z
-    while (np.any(lf_adjustment_global < 0) and M < max_iter):
+    lf_alignment_global = (weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])) * Z
+    # lf_alignment_global: if any of these numbers are below zero, some of the patterns is not stable
+    while (np.any(lf_alignment_global < 0) and (M <= max_iter)):
         for i in range(N):  # for each neuron independently
-            # compute overlap (h, sigma)
-            lf_adjustment = deepcopy((weights[i, :] @ Z + biases[i]) * Z[i, :])
-            #pick the pattern with the weakest overlap
-            ind_min = np.argmin(lf_adjustment)
+            # compute local field alignment (h, sigma)
+            lf_alignment = deepcopy((weights[i, :] @ Z + biases[i]) * Z[i, :])
+            # pick the pattern with the weakest lf alignment
+            ind_min = np.argmin(lf_alignment)
             weakest_pattern = np.array(deepcopy(patterns[ind_min].reshape(1, N))).squeeze()
             h_i = (weights[i, :] @ weakest_pattern.T + biases[i])
             # if the  new pattern is not already stable with margin 1
+            # it doesnt really matter what exact margin is here, as weights could be scaled by an arbitrary positive factor
             while (h_i * weakest_pattern[i] < 1):
+                # add bisection search here?
                 weights[i, :] = deepcopy(weights[i, :] + lmbd * weakest_pattern[i] * weakest_pattern)
                 biases[i] = deepcopy(biases[i] + lmbd * weakest_pattern[i])
                 h_i = (weights[i, :] @ weakest_pattern.T + biases[i])
-        lf_adjustment_global = (weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])) * Z
+        lf_alignment_global = (weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])) * Z
         M += 1
         if M >= max_iter:
             print('Maximum number of iterations has been exceeded')
+
+    #rescale weights and biases:
+    normalising_factor = np.maximum(np.max(np.abs(weights)),np.max(np.abs(biases)))
+    weights = weights / normalising_factor
+    biases = biases / normalising_factor
+
     return weights, biases
 
 # def Gardner(N, patterns, weights, biases, lmbd, k):
 #     '''
-#     Gardner rule rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks
+#     Gardner rule rule proposed in (1988) The space of interactions in neural network models
 #     '''
 #     for i in range(N):  # for each neuron independently
 #         for j in range(patterns.shape[0]):
 #             pattern = np.array(deepcopy(patterns[j].reshape(1, N))).squeeze()
 #             h_i = (weights[i, :] @ pattern.T + biases[i])
-#             y = h_i * pattern[i]/(np.sqrt(np.sum(weights[i,:]**2+ biases[i]**2)))
-#             while (y <= k):
+#             sum_of_squares = np.sum(weights[i, :] ** 2) + biases[i] ** 2
+#             y = (h_i * pattern[i])/(np.sqrt(sum_of_squares))
+#             while (k >= y):
 #                 weights[i, :] = deepcopy(weights[i, :] + lmbd * pattern[i] * pattern)
+#                 weights[i, i] = 0
 #                 biases[i] = deepcopy(biases[i] + lmbd * pattern[i])
 #                 h_i = (weights[i, :] @ pattern.T + biases[i])
-#                 y = h_i * pattern[i] / (np.sqrt(np.sum(weights[i, :] ** 2 + biases[i] ** 2)))
+#                 sum_of_squares = np.sum(weights[i,:]**2) + biases[i]**2
+#                 y = (h_i * pattern[i])/(np.sqrt(sum_of_squares))
 #     return weights, biases
 
 def Gardner(N, patterns, weights, biases, lmbd, k, max_iter):
     '''
-    Gardner rule rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks
+    Gardner rule rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks +
+    Krauth Mezard update strategy
     '''
     Z = np.array(patterns).T
     M = 0
-    y_global = ((weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])).T /(np.sqrt(np.sum(weights ** 2, axis = 1)))).T * Z
+    p = Z.shape[-1]
+    Z_ = np.vstack([Z, np.ones(p)])
+    w_and_b = deepcopy(np.hstack([weights, biases.reshape(N, 1)]))
+    y_global = ( (w_and_b @ Z_).T/ (np.sqrt(np.sum(w_and_b ** 2, axis=1))) )* Z.T #
     while (np.any(y_global < k) and M < max_iter):
         for i in range(N):  # for each neuron independently
-            # compute overlap (h, sigma)
-            lf_adjustment = deepcopy(((weights[i, :] @ Z + biases[i])/(np.sqrt(np.sum(weights[i, :] ** 2)))) * Z[i, :])
-            #pick the pattern with the weakest overlap
-            ind_min = np.argmin(lf_adjustment)
-            weakest_pattern = np.array(deepcopy(patterns[ind_min].reshape(1, N))).squeeze()
-            h_i = (weights[i, :] @ weakest_pattern.T + biases[i])
-            # if the  new pattern is not already stable with margin 1
-            while (h_i * weakest_pattern[i]/((np.sqrt(np.sum(weights[i, :] ** 2))))  < k):
-                weights[i, :] = deepcopy(weights[i, :] + lmbd * weakest_pattern[i] * weakest_pattern)
-                biases[i] = deepcopy(biases[i] + lmbd * weakest_pattern[i])
-                h_i = (weights[i, :] @ weakest_pattern.T + biases[i])
-        y_global = ((weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])).T /(np.sqrt(np.sum(weights ** 2, axis = 1)))).T * Z
+            # compute normalised stability measure (h_i, sigma_i)/|w_i|^2_2
+            sum_of_squares = np.sum(weights[i, :] ** 2 + biases[i]**2)
+            ys =  ( (weights[i, :] @ Z + biases[i])/ (np.sqrt(sum_of_squares)) )  * Z[i, :] #
+            #pick the pattern with the weakest y
+            ind_min = np.argmin(ys)
+            weakest_pattern = np.array(deepcopy(patterns[ind_min].reshape(1, N)))
+            h_i = (weights[i, :].reshape(1, N) @ weakest_pattern.T + biases[i]).squeeze()
+            # if the new weakest pattern is not yet stable with the margin k
+            y = (h_i * weakest_pattern[0, i])/(np.sqrt(sum_of_squares)) #
+            while (y < k):
+                weights[i, :] = deepcopy(weights[i, :] + lmbd * (weakest_pattern[0, i] * weakest_pattern).squeeze())
+                #set diagonal elements to zero
+                weights[i, i] = 0
+                biases[i] = biases[i] + lmbd * weakest_pattern[0, i]
+                sum_of_squares = np.sum(weights[i, :] ** 2 + biases[i] ** 2)
+                h_i = (weights[i, :].reshape(1, N) @ weakest_pattern.T + biases[i]).squeeze()
+                y = (h_i * weakest_pattern[0, i])/(np.sqrt(sum_of_squares)) #
+        w_and_b = deepcopy(np.hstack([weights, biases.reshape(N, 1)]))
+        y_global = ( (w_and_b @ Z_).T/ (np.sqrt(np.sum(w_and_b ** 2, axis=1))) )* Z.T #
         M += 1
         if M >= max_iter:
             print('Maximum number of iterations has been exceeded')
-        return weights, biases
+    return weights, biases
+
+def Gardner_Newton(N, patterns, weights, biases, incremental, lmbd, tol, alpha):
+    '''
+    Newton's method for minimising
+    '''
+    if incremental:
+        for i in range(N):  # for each neuron independently
+            for j in range(patterns.shape[0]):
+                pattern = np.array(deepcopy(patterns[j].reshape(1, N)))
+                w_i = weights[i, :]
+                b_i = biases[i]
+                x0 = np.append(w_i, b_i)
+                res = minimize(normalised_overlap, x0, args=(pattern, i, lmbd, alpha),
+                               jac=normalised_overlap_jacobian,# hess=analytical_centre_hessian,
+                               method='BFGS', tol=tol, options={'disp': False})
+                weights[i, :] = deepcopy(res['x'][:-1])
+                biases[i] = deepcopy(res['x'][-1])
+    if incremental == False:
+        patterns = np.array(deepcopy(patterns.reshape(-1, N)))
+        for i in range(N):  # for each neuron independently
+            w_i = weights[i, :]
+            b_i = biases[i]
+            x0 = np.append(w_i, b_i)
+            res = minimize(normalised_overlap, x0, args=(patterns, i, lmbd, alpha),
+                           jac=normalised_overlap_jacobian, # hess=analytical_centre_hessian,
+                           method='BFGS', tol=tol, options={'disp': False})
+            weights[i, :] = deepcopy(res['x'][:-1])
+            biases[i] = deepcopy(res['x'][-1])
+    return weights, biases
 
 # def descent_l2_norm(N, patterns, weights, biases, sc, incremental, symm, lmbd, num_it):
 #     if incremental == True:

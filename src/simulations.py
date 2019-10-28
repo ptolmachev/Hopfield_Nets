@@ -26,8 +26,6 @@ def flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitio
             R[np.arange(num_neurons), np.arange(num_neurons)] = np.zeros(num_neurons)
 
             HN.set_params((1 / num_neurons) * R, np.zeros(num_neurons))
-            if ('unlearning' in learning_options.keys()) and (options['unlearning'] == True):
-                learning_options['HN'] = HN
 
             HN.learn_patterns(patterns, rule, learning_options)
             for n_f in range(1, num_of_flips+1):
@@ -63,18 +61,25 @@ def weights_distribution_plot(num_neurons, num_of_patterns, params):
     plt.close(fig=fig)
     return None
 
-if __name__ == '__main__':                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-    params = dict()
-    params['rule'] = 'DescentCENewton'
-    params['learning_options'] = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
-    params['retrieval_options'] = {'time_of_retrieval' : 50, 'sync' : True}
-    # params['learning_options'] = {}
-    # params['options'] = [{'sc': True, 'incremental' : True, 'unlearning' : True, 'HN' : True, 'unlearn_rate' : 0.1, 'num_of_retrieval' : 10, 'sync' : True, 'time' : 10}]
+if __name__ == '__main__':
     num_neurons = 100
     num_of_flips = 100 - 1
     num_of_patterns = 150
     num_repetitions = 100
-    flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitions, params)
+    rules = ['KrauthMezard', 'DiederichOpperII', 'DescentAnalyticalCentre', 'DescentL1Newton', 'DescentL2Newton', 'DescentCENewton', 'GardnerNewton']
+    options = [{'lmbd': 0.01, 'max_iter' : 100},
+               {'lmbd': 0.01},
+               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01},
+               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01},
+               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01},
+               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01},
+               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01}]
+    for i, rule in enumerate(rules):
+        params = dict()
+        params['rule']  = rule
+        params['learning_options'] = options[i]
+        params['retrieval_options'] = {'time_of_retrieval' : 50, 'sync' : True}
+        flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitions, params)
     # for i in range(1,150):
     #     print(i)
     #     weights_distribution_plot(100, i, params)
