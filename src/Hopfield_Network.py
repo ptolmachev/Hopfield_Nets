@@ -1,4 +1,5 @@
 import numpy as np
+# import autograd.numpy as np
 from copy import deepcopy
 from matplotlib import pyplot as plt
 from learning_rules import *
@@ -39,24 +40,26 @@ class Hopfield_network():
             self.weights, self.biases = storkey(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'StorkeyNormalisedLF':
             self.weights, self.biases = storkey_normalised_lf(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DescentL2Newton':
-            self.weights, self.biases = descent_l2_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DescentL1Newton':
-            self.weights, self.biases = descent_l1_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DescentCENewton':
-            self.weights, self.biases = descent_crossentropy_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DescentAnalyticalCentre':
-            self.weights, self.biases = descent_analytical_centre_newton(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DiederichOpperII':
+        elif rule == 'DescentL2':
+            self.weights, self.biases = descent_l2(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentL1':
+            self.weights, self.biases = descent_l1(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentCE':
+            self.weights, self.biases = descent_crossentropy(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentBarrier':
+            self.weights, self.biases = descent_barrier(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentNormalisedOverlap':
+            self.weights, self.biases = descent_normalised_overlap(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentBarrierNormalisedOverlap':
+            self.weights, self.biases = descent_barrier_normalised_overlap(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DiederichOpperI':
             self.weights, self.biases = DiederichOpper_I(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DiederichOpperIII':
+        elif rule == 'DiederichOpperII':
             self.weights, self.biases = DiederichOpper_II(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'KrauthMezard':
             self.weights, self.biases = Krauth_Mezard(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'Gardner':
             self.weights, self.biases = Gardner(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'GardnerNewton':
-            self.weights, self.biases = Gardner_Newton(self.num_neurons, patterns, self.weights, self.biases, **options)
         else:
             raise ValueError('the specified learning rule is not implemented')
         return None
@@ -90,16 +93,17 @@ class Hopfield_network():
 
 if __name__ == '__main__':
     num_neurons = 100
-    num_patterns = 25
+    num_patterns = 40
     sync = False
-    flips = 30
+    flips = 10
     time = 30
     num = 2
-    # rule = 'GardnerNewton'
-    # options = {'incremental' : False, 'lmbd': 0.5, 'tol' : 1e-3, 'alpha' : 0.001}
 
-    rule = 'Gardner'
-    options = {'lmbd': 1e-2, 'k' : 1.0, 'max_iter' : 200}
+    rule = 'DescentBarrierNormalisedOverlap'
+    options = {'incremental' : False, 'lmbd': 0.5, 'tol' : 1e-4}
+
+    # rule = 'Gardner'
+    # options = {'lmbd': 1e-2, 'k' : 1.0, 'max_iter' : 200}
 
     # rule = 'KrauthMezard'
     # options = {'lmbd': 0.01, 'max_iter' : 100}
@@ -110,16 +114,16 @@ if __name__ == '__main__':
     # rule = 'DiederichOpperII'
     # options = {'lmbd': 0.01}
     #
-    # rule = 'DescentAnalyticalCentre'
+    # rule = 'DescentBarrier'
     # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}
 
-    # rule = 'DescentAnalyticalCentre'
+    # rule = 'DescentBarrier'
     # options = {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01}
     #
     # rule = 'Pseudoinverse'
     # options = {}
 
-    # rule = 'DescentCENewton'
+    # rule = 'DescentCE'
     # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
 
     HN = Hopfield_network(num_neurons=num_neurons)

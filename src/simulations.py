@@ -66,7 +66,7 @@ if __name__ == '__main__':
     num_of_flips = 100 - 1
     num_of_patterns = 150
     num_repetitions = 100
-    rules = ['KrauthMezard', 'DiederichOpperII', 'DescentAnalyticalCentre', 'DescentL1Newton', 'DescentL2Newton', 'DescentCENewton', 'GardnerNewton']
+    rules = ['KrauthMezard', 'DiederichOpperII', 'DescentBarrier', 'DescentL1', 'DescentL2', 'DescentCE', 'DescentNormalisedOverlap']
     options = [{'lmbd': 0.01, 'max_iter' : 100},
                {'lmbd': 0.01},
                {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01},

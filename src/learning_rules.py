@@ -1,11 +1,13 @@
-import numpy as np
+# import numpy as np
+import autograd.numpy as np
+from autograd import elementwise_grad as egrad
+from autograd import jacobian
 from copy import deepcopy
 from scipy.optimize import minimize
 from utils import normalise_weights
 from scipy.sparse.linalg import lsqr
 from math_utils import *
 #utils
-
 
 def hebbian_lr(N, patterns, weights, biases, sc, incremental):
     '''
@@ -117,7 +119,7 @@ def storkey_normalised_lf(N, patterns, weights, biases, sc, incremental):
         weights += Y
     return weights, biases
 
-def descent_l2_newton(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_l2(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} (lmbd h_i^k sigma_i^k - sigma_i^k)^2
     '''
@@ -146,7 +148,7 @@ def descent_l2_newton(N, patterns, weights, biases, incremental, tol, lmbd, alph
             biases[i] =  deepcopy(res['x'][-1])
     return weights, biases
 
-def descent_l1_newton(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_l1(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} abs(lmbd h_i^k sigma_i^k - sigma_i^k)
     '''
@@ -175,7 +177,7 @@ def descent_l1_newton(N, patterns, weights, biases, incremental, tol, lmbd, alph
             biases[i] =  deepcopy(res['x'][-1])
     return weights, biases
 
-def descent_crossentropy_newton(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_crossentropy(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} abs(lmbd h_i^k sigma_i^k - sigma_i^k)
     '''
@@ -188,7 +190,7 @@ def descent_crossentropy_newton(N, patterns, weights, biases, incremental, tol, 
                 x0 = np.append(w_i, b_i)
                 res = minimize(crossentropy, x0, args=(pattern, i, lmbd, alpha),
                                jac = crossentropy_jacobian, hess = crossentropy_hessian,
-                               method='L-BFGS-B', tol=tol, options={'disp' : False})
+                               method='Newton-CG', tol=tol, options={'disp' : False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] =  deepcopy(res['x'][-1])
     if incremental == False:
@@ -199,13 +201,13 @@ def descent_crossentropy_newton(N, patterns, weights, biases, incremental, tol, 
             x0 = np.append(w_i, b_i)
             res = minimize(crossentropy, x0, args=(patterns, i, lmbd, alpha),
                            jac = crossentropy_jacobian, hess = crossentropy_hessian,
-                           method='L-BFGS-B', tol=tol, options={'disp' : False})
+                           method='Newton-CG', tol=tol, options={'disp' : False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] =  deepcopy(res['x'][-1])
     return weights, biases
 
 
-def descent_analytical_centre_newton(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_barrier(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} exp{-lambda h_i^k sigma_i^k}
     '''
@@ -216,8 +218,8 @@ def descent_analytical_centre_newton(N, patterns, weights, biases, incremental, 
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
-                res = minimize(analytical_centre, x0, args=(pattern, i, lmbd, alpha),
-                               jac=analytical_centre_jacobian, hess=analytical_centre_hessian,
+                res = minimize(sum_barriers, x0, args=(pattern, i, lmbd, alpha),
+                               jac=sum_barriers_jacobian, hess=sum_barriers_hessian,
                                method='Newton-CG', tol=tol, options={'disp': False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] = deepcopy(res['x'][-1])
@@ -227,9 +229,69 @@ def descent_analytical_centre_newton(N, patterns, weights, biases, incremental, 
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
-            res = minimize(analytical_centre, x0, args=(patterns, i, lmbd, alpha),
-                           jac=analytical_centre_jacobian, hess=analytical_centre_hessian,
+            res = minimize(sum_barriers, x0, args=(patterns, i, lmbd, alpha),
+                           jac=sum_barriers_jacobian, hess=sum_barriers_hessian,
                            method='Newton-CG', tol=tol, options={'disp': False})
+            weights[i, :] = deepcopy(res['x'][:-1])
+            biases[i] = deepcopy(res['x'][-1])
+    return weights, biases
+
+def descent_normalised_overlap(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+    '''
+    Newton's method for minimising \sum_{k = 1}^{p} -(h_i^{\mu} \sigma_i^{\mu}) / (\sum_j w_{ij}^2 + b_i^2)^(0.5)
+    '''
+    if incremental:
+        for i in range(N):  # for each neuron independently
+            for j in range(patterns.shape[0]):
+                pattern = np.array(deepcopy(patterns[j].reshape(1, N)))
+                w_i = weights[i, :]
+                b_i = biases[i]
+                x0 = np.append(w_i, b_i)
+                res = minimize(normalised_overlap, x0, args=(pattern, i, lmbd, alpha),
+                               jac=normalised_overlap_jacobian, hess=normalised_overlap_hessian,
+                               method='Newton-CG', tol=tol, options={'disp': False})
+                weights[i, :] = deepcopy(res['x'][:-1])
+                biases[i] = deepcopy(res['x'][-1])
+    if incremental == False:
+        patterns = np.array(deepcopy(patterns.reshape(-1, N)))
+        for i in range(N):  # for each neuron independently
+            w_i = weights[i, :]
+            b_i = biases[i]
+            x0 = np.append(w_i, b_i)
+            res = minimize(normalised_overlap, x0, args=(patterns, i, lmbd, alpha),
+                           jac=normalised_overlap_jacobian, hess=normalised_overlap_hessian,
+                           method='Newton-CG', tol=tol, options={'disp': False})
+            weights[i, :] = deepcopy(res['x'][:-1])
+            biases[i] = deepcopy(res['x'][-1])
+    return weights, biases
+
+def descent_barrier_normalised_overlap(N, patterns, weights, biases, incremental, tol, lmbd):
+    '''
+    Newton's method for minimising \sum_{k = 1}^{p} -(h_i^{\mu} \sigma_i^{\mu}) / (\sum_j w_{ij}^2 + b_i^2)^(0.5)
+    '''
+    jac = egrad(sum_barriers_normalised_overlap, 0)
+   # hess = jacobian(jac)
+    if incremental:
+        for i in range(N):  # for each neuron independently
+            for j in range(patterns.shape[0]):
+                pattern = np.array(deepcopy(patterns[j].reshape(1, N)))
+                w_i = weights[i, :]
+                b_i = biases[i]
+                x0 = np.append(w_i, b_i)
+                res = minimize(sum_barriers_normalised_overlap, x0, args=(pattern, i, lmbd),
+                               jac= jac,# hess = hess,
+                               method='L-BFGS-B', tol=tol, options={'disp': False})
+                weights[i, :] = deepcopy(res['x'][:-1])
+                biases[i] = deepcopy(res['x'][-1])
+    if incremental == False:
+        patterns = np.array(deepcopy(patterns.reshape(-1, N)))
+        for i in range(N):  # for each neuron independently
+            w_i = weights[i, :]
+            b_i = biases[i]
+            x0 = np.append(w_i, b_i)
+            res = minimize(sum_barriers_normalised_overlap, x0, args=(patterns, i, lmbd),
+                           jac= jac,# hess = hess,
+                           method='L-BFGS-B', tol=tol, options={'disp': False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] = deepcopy(res['x'][-1])
     return weights, biases
@@ -356,34 +418,6 @@ def Gardner(N, patterns, weights, biases, lmbd, k, max_iter):
             print('Maximum number of iterations has been exceeded')
     return weights, biases
 
-def Gardner_Newton(N, patterns, weights, biases, incremental, lmbd, tol, alpha):
-    '''
-    Newton's method for minimising
-    '''
-    if incremental:
-        for i in range(N):  # for each neuron independently
-            for j in range(patterns.shape[0]):
-                pattern = np.array(deepcopy(patterns[j].reshape(1, N)))
-                w_i = weights[i, :]
-                b_i = biases[i]
-                x0 = np.append(w_i, b_i)
-                res = minimize(normalised_overlap, x0, args=(pattern, i, lmbd, alpha),
-                               jac=normalised_overlap_jacobian,# hess=analytical_centre_hessian,
-                               method='BFGS', tol=tol, options={'disp': False})
-                weights[i, :] = deepcopy(res['x'][:-1])
-                biases[i] = deepcopy(res['x'][-1])
-    if incremental == False:
-        patterns = np.array(deepcopy(patterns.reshape(-1, N)))
-        for i in range(N):  # for each neuron independently
-            w_i = weights[i, :]
-            b_i = biases[i]
-            x0 = np.append(w_i, b_i)
-            res = minimize(normalised_overlap, x0, args=(patterns, i, lmbd, alpha),
-                           jac=normalised_overlap_jacobian, # hess=analytical_centre_hessian,
-                           method='BFGS', tol=tol, options={'disp': False})
-            weights[i, :] = deepcopy(res['x'][:-1])
-            biases[i] = deepcopy(res['x'][-1])
-    return weights, biases
 
 # def descent_l2_norm(N, patterns, weights, biases, sc, incremental, symm, lmbd, num_it):
 #     if incremental == True:
