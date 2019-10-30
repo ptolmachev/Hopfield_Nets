@@ -296,7 +296,7 @@ def descent_barrier_normalised_overlap(N, patterns, weights, biases, incremental
             biases[i] = deepcopy(res['x'][-1])
     return weights, biases
 
-def DiederichOpper_I(N, patterns, weights, biases, lmbd):
+def DiederichOpper_I(N, patterns, weights, biases, lr):
     '''
     rule I described in Diederich and Opper in (1987) Learning of Correlated Patterns in Spin-Glass Networks by Local Learning Rules
     '''
@@ -306,12 +306,12 @@ def DiederichOpper_I(N, patterns, weights, biases, lmbd):
             h_i = (weights[i, :] @ pattern.T + biases[i])
             # if the  new pattern is not already stable with margin 1
             while (h_i * pattern[i] < 1):
-                weights[i, :] = deepcopy(weights[i, :] + lmbd * pattern[i] * pattern)
-                biases[i] = deepcopy(biases[i] + lmbd * pattern[i])
+                weights[i, :] = deepcopy(weights[i, :] + lr * pattern[i] * pattern)
+                biases[i] = deepcopy(biases[i] + lr * pattern[i])
                 h_i = (weights[i, :] @ pattern.T + biases[i])
     return weights, biases
 
-def DiederichOpper_II(N, patterns, weights, biases, lmbd, tol):
+def DiederichOpper_II(N, patterns, weights, biases, lr, tol):
     '''
     rule II described in Diederich and Opper in (1987) Learning of Correlated Patterns in Spin-Glass Networks by Local Learning Rules
     '''
@@ -320,14 +320,14 @@ def DiederichOpper_II(N, patterns, weights, biases, lmbd, tol):
             pattern = np.array(deepcopy(patterns[j].reshape(1, N))).squeeze()
             h_i = (weights[i, :] @ pattern.T + biases[i])
             # if the  new pattern is not already stable with margin 1
-            while (1 - h_i * pattern[i]) > tol:
-                weights[i, :] = deepcopy(weights[i, :] + lmbd * pattern[i] * pattern * (1 - h_i * pattern[i]))
-                biases[i] = deepcopy(biases[i] + lmbd * pattern[i])* (1 - h_i * pattern[i])
+            while (np.abs(1 - h_i * pattern[i])) > tol:
+                weights[i, :] = deepcopy(weights[i, :] + lr * pattern[i] * pattern * (1 - h_i * pattern[i]))
+                biases[i] = deepcopy(biases[i] + lr * pattern[i])* (1 - h_i * pattern[i])
                 h_i = (weights[i, :] @ pattern.T + biases[i])
     return weights, biases
 
 
-def Krauth_Mezard(N, patterns, weights, biases, lmbd, max_iter):
+def Krauth_Mezard(N, patterns, weights, biases, lr, max_iter):
     '''
     Krauth-Mezard rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks
     '''
@@ -347,8 +347,8 @@ def Krauth_Mezard(N, patterns, weights, biases, lmbd, max_iter):
             # it doesnt really matter what exact margin is here, as weights could be scaled by an arbitrary positive factor
             while (h_i * weakest_pattern[i] < 1):
                 # add bisection search here?
-                weights[i, :] = deepcopy(weights[i, :] + lmbd * weakest_pattern[i] * weakest_pattern)
-                biases[i] = deepcopy(biases[i] + lmbd * weakest_pattern[i])
+                weights[i, :] = deepcopy(weights[i, :] + lr * weakest_pattern[i] * weakest_pattern)
+                biases[i] = deepcopy(biases[i] + lr * weakest_pattern[i])
                 h_i = (weights[i, :] @ weakest_pattern.T + biases[i])
         lf_alignment_global = (weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])) * Z
         M += 1
@@ -381,7 +381,7 @@ def Krauth_Mezard(N, patterns, weights, biases, lmbd, max_iter):
 #                 y = (h_i * pattern[i])/(np.sqrt(sum_of_squares))
 #     return weights, biases
 
-def Gardner(N, patterns, weights, biases, lmbd, k, max_iter):
+def Gardner(N, patterns, weights, biases, lr, k, max_iter):
     '''
     Gardner rule rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks +
     Krauth Mezard update strategy
@@ -404,10 +404,10 @@ def Gardner(N, patterns, weights, biases, lmbd, k, max_iter):
             # if the new weakest pattern is not yet stable with the margin k
             y = (h_i * weakest_pattern[0, i])/(np.sqrt(sum_of_squares)) #
             while (y < k):
-                weights[i, :] = deepcopy(weights[i, :] + lmbd * (weakest_pattern[0, i] * weakest_pattern).squeeze())
+                weights[i, :] = deepcopy(weights[i, :] + lr * (weakest_pattern[0, i] * weakest_pattern).squeeze())
                 #set diagonal elements to zero
                 weights[i, i] = 0
-                biases[i] = biases[i] + lmbd * weakest_pattern[0, i]
+                biases[i] = biases[i] + lr * weakest_pattern[0, i]
                 sum_of_squares = np.sum(weights[i, :] ** 2 + biases[i] ** 2)
                 h_i = (weights[i, :].reshape(1, N) @ weakest_pattern.T + biases[i]).squeeze()
                 y = (h_i * weakest_pattern[0, i])/(np.sqrt(sum_of_squares)) #

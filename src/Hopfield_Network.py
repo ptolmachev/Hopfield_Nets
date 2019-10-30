@@ -93,14 +93,14 @@ class Hopfield_network():
 
 if __name__ == '__main__':
     num_neurons = 100
-    num_patterns = 40
+    num_patterns = 20
     sync = False
-    flips = 10
+    flips = 20
     time = 30
     num = 2
 
-    rule = 'DescentBarrierNormalisedOverlap'
-    options = {'incremental' : False, 'lmbd': 0.5, 'tol' : 1e-4}
+    rule = 'Gardner'
+    options = {'lr': 1e-2, 'k' : 1.0, 'max_iter' : 200}
 
     # rule = 'Gardner'
     # options = {'lmbd': 1e-2, 'k' : 1.0, 'max_iter' : 200}

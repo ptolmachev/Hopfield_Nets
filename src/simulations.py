@@ -62,19 +62,40 @@ def weights_distribution_plot(num_neurons, num_of_patterns, params):
     return None
 
 if __name__ == '__main__':
-    num_neurons = 100
-    num_of_flips = 100 - 1
-    num_of_patterns = 150
+    num_neurons = 75
+    num_of_flips = 37
+    num_of_patterns = 75
     num_repetitions = 100
-    rules = ['KrauthMezard', 'DiederichOpperII', 'DescentBarrier', 'DescentL1', 'DescentL2', 'DescentCE', 'DescentNormalisedOverlap']
-    options = [{'lmbd': 0.01, 'max_iter' : 100},
-               {'lmbd': 0.01},
-               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01},
-               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01},
-               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01},
-               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01},
-               {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01}]
+
+
+    rules = ['Hebb', 'Storkey', 'Pseudoinverse', 'KrauthMezard',
+             'DescentBarrier', 'DescentBarrierNormalisedOverlap', 'DescentL1', 'DescentL2', #'DescentCE',
+             'Hebb', 'Storkey', 'DiederichOpperI', 'DiederichOpperII',
+              'DescentBarrier', 'DescentL1', 'DescentL2', #'DescentCE',
+              'DescentBarrierNormalisedOverlap', 'Gardner']
+    options = [{'incremental' : False, 'sc' : True },  #Hebbian
+               {'incremental' : False, 'sc': True, 'order': 2},  # Storkey
+               {},  #Pseudoinverse
+               {'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
+               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentBarrier
+               {'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentNormalisedOverlap
+               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentL1
+               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentL2
+               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentCE
+               {'incremental': True, 'sc': True},  # Hebbian
+               {'incremental': True, 'sc': True, 'order': 2},  # Storkey
+               {'lr': 1e-2},  # DOI
+               {'lr': 1e-2, 'tol': 1e-2},  # DOII
+               {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5, 'alpha': 0.01},  # DescentBarrier
+               {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5},  # DescentNormalisedOverlap
+               {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5, 'alpha': 0.01},  # DescentL1
+               {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5, 'alpha': 0.01},  # DescentL2
+               # {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5, 'alpha': 0.01},  # DescentCE
+               {'lr': 1e-2, 'k': 1.0, 'max_iter': 200}  # Gardner
+               ]
     for i, rule in enumerate(rules):
+        print(rule)
+        print('\n')
         params = dict()
         params['rule']  = rule
         params['learning_options'] = options[i]
