@@ -42,8 +42,6 @@ class Hopfield_network():
             self.weights, self.biases = storkey_normalised_lf(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL2':
             self.weights, self.biases = descent_l2(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DescentL2SI':
-            self.weights, self.biases = descent_l2_si(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL1':
             self.weights, self.biases = descent_l1(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentCE':
@@ -62,6 +60,8 @@ class Hopfield_network():
             self.weights, self.biases = Krauth_Mezard(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'GardnerKrauthMezard':
             self.weights, self.biases = Gardner_Krauth_Mezard(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'Gardner':
+            self.weights, self.biases = Gardner(self.num_neurons, patterns, self.weights, self.biases, **options)
         else:
             raise ValueError('the specified learning rule is not implemented')
         return None
@@ -95,11 +95,14 @@ class Hopfield_network():
 
 if __name__ == '__main__':
     num_neurons = 100
-    num_patterns = 30
+    num_patterns = 20
     sync = False
     flips = 20
     time = 30
     num = 2
+
+    # rule = 'Gardner'
+    # options = {'sc' : True, 'lr': 1e-1, 'k' : 1.0}
 
     # rule = 'GardnerKrauthMezard'
     # options = {'sc' : True, 'lr': 1e-2, 'k' : 1.0, 'max_iter' : 150}
@@ -122,12 +125,15 @@ if __name__ == '__main__':
     # rule = 'DescentExpBarrier'
     # options = {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01}
 
-    # rule = 'DescentL2SI'
-    # options = {'incremental' : False, 'tol' : 1e-3}
-
     # rule = 'DescentExpBarrierSI'
     # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5}
-    #
+
+    # rule = 'DescentL2'
+    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}
+
+    # rule = 'DescentL1'
+    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}
+
     # rule = 'Pseudoinverse'
     # options = {}
 

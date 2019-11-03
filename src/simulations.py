@@ -76,12 +76,12 @@ if __name__ == '__main__':
     rules = [#'Hebb',
             # 'Storkey',
             # 'Pseudoinverse',
-            # 'KrauthMezard',
+            'KrauthMezard',
             # 'DescentExpBarrier',
             # 'DescentExpBarrierSI',
             # 'DescentL1',
             # 'DescentL2',
-            'DescentL2SI'
+            # 'DescentL2SI'
             # 'Hebb',
             # 'Storkey'
             # 'DiederichOpperI',
@@ -90,17 +90,17 @@ if __name__ == '__main__':
             # 'DescentExpBarrierSI']
             # 'DescentL1',
             # 'DescentL2',
-            # 'Gardner'
+            'GardnerKrauthMezard'
     ]
     options = [#{'incremental' : False, 'sc' : True },  #Hebbian
                # {'incremental' : False, 'sc': True},  # Storkey
                # {},  #Pseudoinverse
-               # {'sc' : False, 'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
+               {'sc' : False, 'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
                # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentExpBarrier
                # {'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentExpBarrierSI
                # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
                # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
-                {'incremental': False, 'tol': 1e-3}  # DescentL2SI
+               #  {'incremental': False, 'tol': 1e-3}  # DescentL2SI
                # {'incremental': True, 'sc': True},  # Hebbian
                # {'incremental': True, 'sc': True},  # Storkey
                # {'sc' : True, 'lr': 1e-2},  # DOI
@@ -109,7 +109,7 @@ if __name__ == '__main__':
                # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5},  # DescentExpBarrierSI
                # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL1
                # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL2
-               # {'sc' : False, 'lr': 1e-2, 'k': 1.0, 'max_iter': 100}  # GardnerKrauthMezard
+               {'sc' : True, 'lr': 1e-2, 'k': 1.0, 'max_iter': 100}  # GardnerKrauthMezard
                ]
     for i, rule in enumerate(rules):
         print(rule)

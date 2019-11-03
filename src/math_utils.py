@@ -84,31 +84,24 @@ def l2norm_difference(weights_and_bias, patterns, i, lmbd, alpha):
     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
     return (1 / 2) * np.sum((lmbd * h - Z[i, :])**2) + (alpha / 2) * np.sum(weights_and_bias ** 2)
 
-def l2norm_difference_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
-    Z = np.array(patterns).T
-    p = Z.shape[-1]
-    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-    Z_ = np.vstack([Z, np.ones(p)])
-    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-    grad_w_b = ((lmbd * h - Z[i, :]) * lmbd) @ Z_.T + alpha * weights_and_bias
-    return grad_w_b
+# def l2norm_difference_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
+#     Z = np.array(patterns).T
+#     p = Z.shape[-1]
+#     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+#     Z_ = np.vstack([Z, np.ones(p)])
+#     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+#     grad_w_b = ((lmbd * h - Z[i, :]) * lmbd) @ Z_.T + alpha * weights_and_bias
+#     return grad_w_b
 
-def l2norm_difference_hessian(weights_and_bias, patterns, i, lmbd, alpha):
-    Z = np.array(patterns).T
-    N = Z.shape[0]
-    p = Z.shape[-1]
-    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-    Z_ = np.vstack([Z, np.ones(p)])
-    H = alpha * np.eye(N + 1) + lmbd**2 * Z_ @ Z_.T
-    return H
-
-def l2norm_difference_si(weights_and_bias, patterns, i):
-    Z = np.array(patterns).T
-    p = Z.shape[-1]
-    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-    Z_ = np.vstack([Z, np.ones(p)])
-    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-    return (1 / 2) * np.sum(((h/(np.sqrt(np.sum(weights_and_bias ** 2)))) - Z[i, :])**2)
+# def l2norm_difference_hessian(weights_and_bias, patterns, i, lmbd, alpha):
+#     Z = np.array(patterns).T
+#     N = Z.shape[0]
+#     p = Z.shape[-1]
+#     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+#     Z_ = np.vstack([Z, np.ones(p)])
+#     H = alpha * np.eye(N + 1) + lmbd**2 * Z_ @ Z_.T
+#     return H
+#
 
 ### L1 NORM ###
 
@@ -120,14 +113,14 @@ def l1norm_difference(weights_and_bias, patterns, i, lmbd, alpha):
     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
     return np.sum(np.abs(lmbd * h - Z[i, :])) + (alpha / 2) * np.sum(weights_and_bias ** 2)
 
-def l1norm_difference_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
-    Z = np.array(patterns).T
-    p = Z.shape[-1]
-    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-    Z_ = np.vstack([Z, np.ones(p)])
-    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-    grad_w_b = (np.sign(lmbd * h - Z[i, :]) * lmbd) @ Z_.T + alpha * weights_and_bias
-    return grad_w_b
+# def l1norm_difference_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
+#     Z = np.array(patterns).T
+#     p = Z.shape[-1]
+#     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+#     Z_ = np.vstack([Z, np.ones(p)])
+#     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+#     grad_w_b = (np.sign(lmbd * h - Z[i, :]) * lmbd) @ Z_.T + alpha * weights_and_bias
+#     return grad_w_b
 
 ### CROSSENTROPY
 
@@ -140,26 +133,26 @@ def crossentropy(weights_and_bias, patterns, i, lmbd, alpha):
     return np.sum( - ((1 + Z[i, :])/ 2) * np.log((1 + lmbd * h) / 2) - ((1 - Z[i, :]) / 2) * np.log((1 - lmbd * h) / 2) ) \
            + (alpha / 2) * np.sum(weights_and_bias ** 2)
 
-def crossentropy_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
-    Z = np.array(patterns).T
-    p = Z.shape[-1]
-    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-    Z_ = np.vstack([Z, np.ones(p)])
-    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-    grad_w_b = lmbd * ((lmbd * h - Z[i, :]) / (1 - lmbd ** 2 * h ** 2)) @ Z_.T + alpha * weights_and_bias
-    return grad_w_b
-
-# ADD HESSIAN FOR CROSSENTROPY
-def crossentropy_hessian(weights_and_bias, patterns, i, lmbd, alpha):
-    Z = np.array(patterns).T
-    p = Z.shape[-1]
-    N = Z.shape[0]
-    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-    Z_ = np.vstack([Z, np.ones(p)])
-    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-    grad_w_b = lmbd * ((lmbd * h - Z[i, :]) / (1 - lmbd ** 2 * h ** 2)) @ Z_.T + alpha * weights_and_bias
-    H = alpha * np.eye(N + 1) + lmbd * (Z[i, :]/(1 - lmbd ** 2 * h ** 2) @ Z_.T) - lmbd**3 * (((lmbd * h - Z[i, :]) * h/(1 - lmbd ** 2 * h ** 2))**2) @ Z_.T
-    return H
+# def crossentropy_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
+#     Z = np.array(patterns).T
+#     p = Z.shape[-1]
+#     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+#     Z_ = np.vstack([Z, np.ones(p)])
+#     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+#     grad_w_b = lmbd * ((lmbd * h - Z[i, :]) / (1 - lmbd ** 2 * h ** 2)) @ Z_.T + alpha * weights_and_bias
+#     return grad_w_b
+#
+# # ADD HESSIAN FOR CROSSENTROPY
+# def crossentropy_hessian(weights_and_bias, patterns, i, lmbd, alpha):
+#     Z = np.array(patterns).T
+#     p = Z.shape[-1]
+#     N = Z.shape[0]
+#     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+#     Z_ = np.vstack([Z, np.ones(p)])
+#     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+#     grad_w_b = lmbd * ((lmbd * h - Z[i, :]) / (1 - lmbd ** 2 * h ** 2)) @ Z_.T + alpha * weights_and_bias
+#     H = alpha * np.eye(N + 1) + lmbd * (Z[i, :]/(1 - lmbd ** 2 * h ** 2) @ Z_.T) - lmbd**3 * (((lmbd * h - Z[i, :]) * h/(1 - lmbd ** 2 * h ** 2))**2) @ Z_.T
+#     return H
 
 ### EXPONENTIAL BARRIER ###
 
@@ -198,55 +191,21 @@ def overlap_si(weights_and_bias, patterns, i, lmbd):
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
     Z_ = np.vstack([Z, np.ones(p)])
     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-    return -np.sum((lmbd * h * Z[i, :])) / np.sqrt(np.sum(weights_and_bias ** 2))
+    return -np.sum((lmbd * h * Z[i, :])) / np.sqrt(np.sum(weights_and_bias ** 2)) + 0.1*(np.sum(weights_and_bias ** 2) - 1)**2
 
-def overlap_si_jacobian(weights_and_bias, patterns, i, lmbd):
-    Z = np.array(patterns).T
-    p = Z.shape[-1]
-    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-    Z_ = np.vstack([Z, np.ones(p)])
-    h_i = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-    term1 = -np.sum(lmbd * Z_ * Z[i, :], axis=1) / np.sqrt(np.sum(weights_and_bias ** 2))
-    term2 = np.sum((lmbd * h_i * Z[i, :].squeeze())) * weights_and_bias / (np.sum(weights_and_bias ** 2)) ** (3/2)
-    grad_w_b = term1 + term2
-    return grad_w_b
-
-def overlap_si_hessian(weights_and_bias, patterns, i, lmbd):
-    Z = np.array(patterns).T
-    N = Z.shape[0]
-    p = Z.shape[-1]
-    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-    Z_ = np.vstack([Z, np.ones(p)])
-    h_i = (weights_and_bias.reshape(1, -1) @ Z_).squeeze()  # vector of length p
-    term1 = lmbd * (np.sum(Z_ * Z[i, :], axis = 1).reshape(-1, 1) @ weights_and_bias.reshape(1,-1)) / (np.sum(weights_and_bias ** 2)) ** (3/2)
-    term2 = np.eye(N + 1) * np.sum((lmbd * h_i * Z[i, :].squeeze())) / (np.sum(weights_and_bias ** 2)) ** (3/2)
-    term3 = - 3 * np.sum((lmbd * h_i * Z[i, :].squeeze())) * (weights_and_bias.reshape(-1, 1) @ weights_and_bias.reshape(1, -1)) / (np.sum(weights_and_bias ** 2)) ** (5/2)
-    return term1 + term2 + term3
-
-### sum of exponents of normalised overlaps ###
-
-def sum_exp_barriers_si(weights_and_bias, patterns, i, lmbd):
-    Z = np.array(patterns).T
-    p = Z.shape[-1]
-    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
-    Z_ = np.vstack([Z, np.ones(p)])
-    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-    return np.sum(np.exp((-lmbd * h * Z[i, :]) / np.sqrt(np.sum(weights_and_bias ** 2))))
-
-
-# jac is incorrect
-# def sum_barriers_normalised_overlap_jacobian(weights_and_bias, patterns, i, lmbd):
+# def overlap_si_jacobian(weights_and_bias, patterns, i, lmbd):
 #     Z = np.array(patterns).T
 #     p = Z.shape[-1]
 #     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
 #     Z_ = np.vstack([Z, np.ones(p)])
 #     h_i = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
-#     term1 = np.sum((lmbd ** 2) * np.exp((-lmbd * h_i * Z[i, :])) / np.sqrt(np.sum(weights_and_bias ** 2)) * Z_ * Z[i, :], axis=1) / np.sqrt(np.sum(weights_and_bias ** 2))
-#     term2 = -np.sum(((lmbd ** 2) * h_i * Z[i, :].squeeze()) * np.exp((-lmbd * h_i * Z[i, :])) / np.sqrt(np.sum(weights_and_bias ** 2))) * weights_and_bias / (np.sum(weights_and_bias ** 2)) ** (3/2)
-#     grad_w_b = term1 + term2
+#     term1 = -np.sum(lmbd * Z_ * Z[i, :], axis=1) / np.sqrt(np.sum(weights_and_bias ** 2))
+#     term2 = np.sum((lmbd * h_i * Z[i, :].squeeze())) * weights_and_bias / (np.sum(weights_and_bias ** 2)) ** (3/2)
+#     term3 = 2*2*0.1*(np.sum(weights_and_bias ** 2) - 1) * weights_and_bias
+#     grad_w_b = term1 + term2 + term3
 #     return grad_w_b
-
-# def sum_barriers_normalised_overlap_hessian(weights_and_bias, patterns, i, lmbd, alpha):
+#
+# def overlap_si_hessian(weights_and_bias, patterns, i, lmbd):
 #     Z = np.array(patterns).T
 #     N = Z.shape[0]
 #     p = Z.shape[-1]
@@ -256,5 +215,16 @@ def sum_exp_barriers_si(weights_and_bias, patterns, i, lmbd):
 #     term1 = lmbd * (np.sum(Z_ * Z[i, :], axis = 1).reshape(-1, 1) @ weights_and_bias.reshape(1,-1)) / (np.sum(weights_and_bias ** 2)) ** (3/2)
 #     term2 = np.eye(N + 1) * np.sum((lmbd * h_i * Z[i, :].squeeze())) / (np.sum(weights_and_bias ** 2)) ** (3/2)
 #     term3 = - 3 * np.sum((lmbd * h_i * Z[i, :].squeeze())) * (weights_and_bias.reshape(-1, 1) @ weights_and_bias.reshape(1, -1)) / (np.sum(weights_and_bias ** 2)) ** (5/2)
-#     term4 = alpha * np.eye(N + 1)
-#     return term1 + term2 + term3 + term4
+#     # term4 =
+#     return term1 + term2 + term3
+
+### sum of exponents of normalised overlaps ###
+
+def sum_exp_barriers_si(weights_and_bias, patterns, i, lmbd):
+    Z = np.array(patterns).T
+    p = Z.shape[-1]
+    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+    Z_ = np.vstack([Z, np.ones(p)])
+    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+    return np.sum(np.exp((-lmbd * h * Z[i, :]) / np.sqrt(np.sum(weights_and_bias ** 2)))) + 0.1*(np.sum(weights_and_bias ** 2) - 1)**2
+

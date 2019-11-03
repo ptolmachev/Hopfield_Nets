@@ -130,8 +130,8 @@ def flips_and_patterns_3d(file_name):
 
 
 if __name__ == '__main__':
-    rule = 'DiederichOpperII'
-    arguments = {'lr': 1e-2, 'tol': 1e-2}
+    rule = 'DescentL2SI'
+    arguments = {'incremental': False, 'tol': 1e-3}
     # arguments = {'sc': True, 'incremental' : True, 'unlearning' : True, 'HN' : True, 'unlearn_rate' : 0.1, 'num_of_retrieval' : 10, 'sync' : True, 'time' : 10}
     # arguments =  {'lmbd' : 0.001}#{'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
     # arguments = {'gamma' : 100}
