@@ -317,7 +317,7 @@ def descent_l2_si(N, patterns, weights, biases, incremental, tol):
             biases[i] = deepcopy(res['x'][-1])
     return weights, biases
 
-def DiederichOpper_I(N, patterns, weights, biases, lr):
+def DiederichOpper_I(N, patterns, weights, biases, sc, lr):
     '''
     rule I described in Diederich and Opper in (1987) Learning of Correlated Patterns in Spin-Glass Networks by Local Learning Rules
     '''
@@ -329,10 +329,12 @@ def DiederichOpper_I(N, patterns, weights, biases, lr):
             while (h_i * pattern[i] < 1):
                 weights[i, :] = deepcopy(weights[i, :] + lr * pattern[i] * pattern)
                 biases[i] = deepcopy(biases[i] + lr * pattern[i])
+                if sc == True:
+                    weights[i, i] = 0
                 h_i = (weights[i, :] @ pattern.T + biases[i])
     return weights, biases
 
-def DiederichOpper_II(N, patterns, weights, biases, lr, tol):
+def DiederichOpper_II(N, patterns, weights, biases, sc, lr, tol):
     '''
     rule II described in Diederich and Opper in (1987) Learning of Correlated Patterns in Spin-Glass Networks by Local Learning Rules
     '''
@@ -344,11 +346,13 @@ def DiederichOpper_II(N, patterns, weights, biases, lr, tol):
             while (np.abs(1 - h_i * pattern[i])) > tol:
                 weights[i, :] = deepcopy(weights[i, :] + lr * pattern[i] * pattern * (1 - h_i * pattern[i]))
                 biases[i] = deepcopy(biases[i] + lr * pattern[i])* (1 - h_i * pattern[i])
+                if sc == True:
+                    weights[i, i] = 0
                 h_i = (weights[i, :] @ pattern.T + biases[i])
     return weights, biases
 
 
-def Krauth_Mezard(N, patterns, weights, biases, lr, max_iter):
+def Krauth_Mezard(N, patterns, weights, biases, sc, lr, max_iter):
     '''
     Krauth-Mezard rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks
     '''
@@ -370,6 +374,8 @@ def Krauth_Mezard(N, patterns, weights, biases, lr, max_iter):
                 # add bisection search here?
                 weights[i, :] = deepcopy(weights[i, :] + lr * weakest_pattern[i] * weakest_pattern)
                 biases[i] = deepcopy(biases[i] + lr * weakest_pattern[i])
+                if sc == True:
+                    weights[i, i] = 0
                 h_i = (weights[i, :] @ weakest_pattern.T + biases[i])
         lf_alignment_global = (weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])) * Z
         M += 1
@@ -402,7 +408,7 @@ def Krauth_Mezard(N, patterns, weights, biases, lr, max_iter):
 #                 y = (h_i * pattern[i])/(np.sqrt(sum_of_squares))
 #     return weights, biases
 
-def Gardner_Krauth_Mezard(N, patterns, weights, biases, lr, k, max_iter):
+def Gardner_Krauth_Mezard(N, patterns, weights, biases, sc, lr, k, max_iter):
     '''
     Gardner rule rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks +
     Krauth Mezard update strategy
@@ -427,7 +433,8 @@ def Gardner_Krauth_Mezard(N, patterns, weights, biases, lr, k, max_iter):
             while (y < k):
                 weights[i, :] = deepcopy(weights[i, :] + lr * (weakest_pattern[0, i] * weakest_pattern).squeeze())
                 #set diagonal elements to zero
-                weights[i, i] = 0
+                if sc == True:
+                    weights[i, i] = 0
                 biases[i] = biases[i] + lr * weakest_pattern[0, i]
                 sum_of_squares = np.sum(weights[i, :] ** 2 + biases[i] ** 2)
                 h_i = (weights[i, :].reshape(1, N) @ weakest_pattern.T + biases[i]).squeeze()

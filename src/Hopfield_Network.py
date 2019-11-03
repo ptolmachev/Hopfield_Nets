@@ -95,32 +95,38 @@ class Hopfield_network():
 
 if __name__ == '__main__':
     num_neurons = 100
-    num_patterns = 20
+    num_patterns = 30
     sync = False
     flips = 20
     time = 30
     num = 2
 
-    rule = 'Gardner'
-    options = {'lr': 1e-2, 'k' : 1.0, 'max_iter' : 200}
+    # rule = 'GardnerKrauthMezard'
+    # options = {'sc' : True, 'lr': 1e-2, 'k' : 1.0, 'max_iter' : 150}
 
     # rule = 'Gardner'
     # options = {'lmbd': 1e-2, 'k' : 1.0, 'max_iter' : 200}
-
+    #
     # rule = 'KrauthMezard'
-    # options = {'lmbd': 0.01, 'max_iter' : 100}
+    # options = {'sc' : False, 'lr': 1e-2,  'max_iter' : 100}
 
     # rule = 'DiederichOpperI'
-    # options = {'lmbd': 0.01, 'tol' : 1e-4}
+    # options = {'sc' : False, 'lr': 0.01}
 
     # rule = 'DiederichOpperII'
-    # options = {'lmbd': 0.01}
+    # options = {'sc' : False, 'lr': 0.01, 'tol' : 1e-4}
     #
-    # rule = 'DescentBarrier'
+    # rule = 'DescentExpBarrier'
     # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}
 
-    # rule = 'DescentBarrier'
+    # rule = 'DescentExpBarrier'
     # options = {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01}
+
+    # rule = 'DescentL2SI'
+    # options = {'incremental' : False, 'tol' : 1e-3}
+
+    # rule = 'DescentExpBarrierSI'
+    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5}
     #
     # rule = 'Pseudoinverse'
     # options = {}
