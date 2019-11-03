@@ -73,15 +73,18 @@ if __name__ == '__main__':
     num_repetitions = 100
 
 
-    rules = [#'Hebb',
+    rules = [
+            #non-incremental
+            #'Hebb',
             # 'Storkey',
             # 'Pseudoinverse',
-            'KrauthMezard',
+            # 'KrauthMezard',
             # 'DescentExpBarrier',
             # 'DescentExpBarrierSI',
             # 'DescentL1',
-            # 'DescentL2',
-            # 'DescentL2SI'
+            # 'DescentL2'
+
+            #incremental
             # 'Hebb',
             # 'Storkey'
             # 'DiederichOpperI',
@@ -90,26 +93,42 @@ if __name__ == '__main__':
             # 'DescentExpBarrierSI']
             # 'DescentL1',
             # 'DescentL2',
-            'GardnerKrauthMezard'
+            # 'GardnerKrauthMezard'
+
+            # for sc effects
+            # 'Hebb',
+            # 'Storkey',
+            # 'Pseudoinverse',
+            # 'GardnerKrauthMezard',
+            # 'DescentExpBarrierSI',
+
     ]
-    options = [#{'incremental' : False, 'sc' : True },  #Hebbian
+    options = [# Non-incremental
+               #{'incremental' : False, 'sc' : True },  #Hebbian
                # {'incremental' : False, 'sc': True},  # Storkey
                # {},  #Pseudoinverse
-               {'sc' : False, 'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
-               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentExpBarrier
-               # {'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentExpBarrierSI
-               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
-               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
-               #  {'incremental': False, 'tol': 1e-3}  # DescentL2SI
+               # {'sc' : False, 'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
+               {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentExpBarrier
+               {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentExpBarrierSI
+               {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
+               {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}  #DescentL2
+                # incremental
                # {'incremental': True, 'sc': True},  # Hebbian
                # {'incremental': True, 'sc': True},  # Storkey
                # {'sc' : True, 'lr': 1e-2},  # DOI
                # {'sc' : True, 'lr': 1e-2, 'tol': 1e-1},  # DOII
-               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentExpBarrier
-               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5},  # DescentExpBarrierSI
-               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL1
-               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL2
-               {'sc' : True, 'lr': 1e-2, 'k': 1.0, 'max_iter': 100}  # GardnerKrauthMezard
+               # {'sc' : False, 'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentExpBarrier
+               # {'sc' : False, 'incremental': True, 'tol': 1e-1, 'lmbd': 0.5},  # DescentExpBarrierSI
+               # {'sc' : False, 'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL1
+               # {'sc' : False, 'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL2
+               # {'sc' : True, 'lr': 1e-2, 'k': 1.0, 'max_iter': 100}  # GardnerKrauthMezard
+
+                # effects of self connectivity
+                # {'incremental' : False, 'sc' : True },  #Hebbian
+                # {'incremental' : False, 'sc': True},  # Storkey
+                # {},  #Pseudoinverse
+                # {'sc': True, 'lr': 1e-2, 'k': 1.0, 'max_iter': 100},  # GardnerKrauthMezard
+                # {'sc' : False, 'incremental': False, 'tol': 1e-3, 'lmbd': 0.5},  # DescentExpBarrierSI #add bonds
                ]
     for i, rule in enumerate(rules):
         print(rule)

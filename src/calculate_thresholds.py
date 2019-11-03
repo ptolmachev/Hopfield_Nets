@@ -126,18 +126,17 @@ if __name__ == '__main__':
 
 
     rules_nonincremental = ['Hebb', 'Storkey', 'Pseudoinverse', 'KrauthMezard',
-             'DescentExpBarrier', 'DescentExpBarrierSI', 'DescentL1', 'DescentL2', 'DescentL2SI', 'GardnerKrauthMezard' ]
+             'DescentExpBarrier', 'DescentExpBarrierSI', 'DescentL1', 'DescentL2', 'GardnerKrauthMezard']
     options_nonincremental = [
                {'incremental' : False, 'sc' : True },  #Hebbian
                {'incremental' : False, 'sc': True},  # Storkey
                {},  #Pseudoinverse
                {'sc' : True, 'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentExpBarrier
+               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentExpBarrier
                {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5},  # DescentExpBarrierSI
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentL1
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentL2
-               {'incremental': False, 'tol': 1e-3},  # DescentL2SI
-               {'sc' : False, 'lr' :  1e-2, 'k' : 1.0, 'max_iter' : 100}  #GardnerKrauthMezard
+               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
+               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
+               {'sc' : True, 'lr' :  1e-2, 'k' : 1.0, 'max_iter' : 100}  #GardnerKrauthMezard
                ]
     # for i in range(len(rules_incremental)):
     #     rule = rules_incremental[i]

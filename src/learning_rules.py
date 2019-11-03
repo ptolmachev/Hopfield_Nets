@@ -109,7 +109,7 @@ def storkey_normalised_lf(N, patterns, weights, biases, sc, incremental):
         weights += Y
     return weights, biases
 
-def descent_l2(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_l2(N, patterns, weights, biases, sc, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} (lmbd h_i^k sigma_i^k - sigma_i^k)^2
 
@@ -124,8 +124,12 @@ def descent_l2(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
+                bnds = list(zip(-100*np.ones(x0.shape[-1]), 100*np.ones(x0.shape[-1])))
+                if sc == False:
+                    bnds[i] = (0, 0)
                 res = minimize(l2norm_difference, x0, args=(pattern, i, lmbd, alpha),
                                jac = jac,# hess=hess,
+                               bounds = bnds,
                                method='L-BFGS-B', tol=tol, options={'disp' : False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] =  deepcopy(res['x'][-1])
@@ -135,15 +139,19 @@ def descent_l2(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
+            bnds = list(zip(-100*np.ones(x0.shape[-1]),100*np.ones(x0.shape[-1])))
+            if sc == False:
+                bnds[i] = (0, 0)
             res = minimize(l2norm_difference, x0, args=(patterns, i, lmbd, alpha),
                            jac = jac, #hess=hess,
+                           bounds=bnds,
                            method='L-BFGS-B', tol=tol, options={'disp' : False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] =  deepcopy(res['x'][-1])
     return weights, biases
 
 
-def descent_l1(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_l1(N, patterns, weights, biases, sc, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} abs(lmbd h_i^k sigma_i^k - sigma_i^k)
 
@@ -156,8 +164,12 @@ def descent_l1(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
+                bnds = list(zip(-100 * np.ones(x0.shape[-1]), 100 * np.ones(x0.shape[-1])))
+                if sc == False:
+                    bnds[i] = (0, 0)
                 res = minimize(l1norm_difference, x0, args=(pattern, i, lmbd, alpha),
                                jac = jac,
+                               bounds=bnds,
                                method='L-BFGS-B', tol=tol, options={'disp' : False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] =  deepcopy(res['x'][-1])
@@ -167,8 +179,12 @@ def descent_l1(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
+            bnds = list(zip(-100*np.ones(x0.shape[-1]), 100*np.ones(x0.shape[-1])))
+            if sc == False:
+                bnds[i] = (0, 0)
             res = minimize(l1norm_difference, x0, args=(patterns, i, lmbd, alpha),
                            jac = jac,
+                           bounds=bnds,
                            method='L-BFGS-B', tol=tol, options={'disp' : False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] =  deepcopy(res['x'][-1])
@@ -206,7 +222,7 @@ def descent_crossentropy(N, patterns, weights, biases, incremental, tol, lmbd, a
     return weights, biases
 
 
-def descent_exp_barrier(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_exp_barrier(N, patterns, weights, biases, sc, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} exp{-lambda h_i^k sigma_i^k}
 
@@ -221,8 +237,12 @@ def descent_exp_barrier(N, patterns, weights, biases, incremental, tol, lmbd, al
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
+                bnds = list(zip(-100 * np.ones(x0.shape[-1]), 100 * np.ones(x0.shape[-1])))
+                if sc == False:
+                    bnds[i] = (0, 0)
                 res = minimize(sum_exp_barriers, x0, args=(pattern, i, lmbd, alpha),
                                jac=jac,# hess=hess,
+                               bounds=bnds,
                                method='L-BFGS-B', tol=tol, options={'disp': False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] = deepcopy(res['x'][-1])
@@ -232,14 +252,18 @@ def descent_exp_barrier(N, patterns, weights, biases, incremental, tol, lmbd, al
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
+            bnds = list(zip(-100 * np.ones(x0.shape[-1]), 100 * np.ones(x0.shape[-1])))
+            if sc == False:
+                bnds[i] = (0, 0)
             res = minimize(sum_exp_barriers, x0, args=(patterns, i, lmbd, alpha),
                            jac=jac,# hess=hess,
+                           bounds=bnds,
                            method='L-BFGS-B', tol=tol, options={'disp': False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] = deepcopy(res['x'][-1])
     return weights, biases
 
-def descent_exp_barrier_si(N, patterns, weights, biases, incremental, tol, lmbd):
+def descent_exp_barrier_si(N, patterns, weights, biases, sc, incremental, tol, lmbd):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} -(h_i^{\mu} \sigma_i^{\mu}) / (\sum_j w_{ij}^2 + b_i^2)^(0.5)
 
@@ -254,8 +278,12 @@ def descent_exp_barrier_si(N, patterns, weights, biases, incremental, tol, lmbd)
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
+                bnds = list(zip(-100*np.ones(x0.shape[-1]), 100*np.ones(x0.shape[-1])))
+                if sc == False:
+                    bnds[i] = (0, 0)
                 res = minimize(sum_exp_barriers_si, x0, args=(pattern, i, lmbd),
                                jac= jac,# hess = hess,
+                               bounds = bnds,
                                method='L-BFGS-B', tol=tol, options={'disp': False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] = deepcopy(res['x'][-1])
@@ -265,14 +293,18 @@ def descent_exp_barrier_si(N, patterns, weights, biases, incremental, tol, lmbd)
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
+            bnds = list(zip(-np.ones(x0.shape[-1]),np.ones(x0.shape[-1])))
+            if sc == False:
+                bnds[i] = (0, 0)
             res = minimize(sum_exp_barriers_si, x0, args=(patterns, i, lmbd),
                            jac= jac, #hess = hess,
+                           bounds = bnds,
                            method='L-BFGS-B', tol=tol, options={'disp': False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] = deepcopy(res['x'][-1])
     return weights, biases
 
-def descent_overlap_si(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_overlap_si(N, patterns, weights, biases, sc, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} -(h_i^{\mu} \sigma_i^{\mu}) / (\sum_j w_{ij}^2 + b_i^2)^(0.5)
     '''
@@ -285,8 +317,12 @@ def descent_overlap_si(N, patterns, weights, biases, incremental, tol, lmbd, alp
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
+                bnds = list(zip(-100 * np.ones(x0.shape[-1]), 100 * np.ones(x0.shape[-1])))
+                if sc == False:
+                    bnds[i] = (0, 0)
                 res = minimize(overlap_si, x0, args=(pattern, i, lmbd, alpha),
                                jac=jac, hess=hess,
+                               bounds=bnds,
                                method='Newton-CG', tol=tol, options={'disp': False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] = deepcopy(res['x'][-1])
@@ -296,8 +332,12 @@ def descent_overlap_si(N, patterns, weights, biases, incremental, tol, lmbd, alp
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
+            bnds = list(zip(-100 * np.ones(x0.shape[-1]), 100 * np.ones(x0.shape[-1])))
+            if sc == False:
+                bnds[i] = (0, 0)
             res = minimize(overlap_si, x0, args=(patterns, i, lmbd, alpha),
                            jac=jac, hess=hess,
+                           bounds=bnds,
                            method='Newton-CG', tol=tol, options={'disp': False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] = deepcopy(res['x'][-1])

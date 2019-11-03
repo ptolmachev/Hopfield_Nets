@@ -125,14 +125,14 @@ if __name__ == '__main__':
     # rule = 'DescentExpBarrier'
     # options = {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.01}
 
-    # rule = 'DescentExpBarrierSI'
-    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5}
+    rule = 'DescentExpBarrierSI'
+    options = {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5}
 
     # rule = 'DescentL2'
-    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}
+    # options = {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}
 
     # rule = 'DescentL1'
-    # options = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}
+    # options = {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}
 
     # rule = 'Pseudoinverse'
     # options = {}
