@@ -74,44 +74,42 @@ if __name__ == '__main__':
 
 
     rules = [#'Hebb',
-            'Storkey',
+            # 'Storkey',
             # 'Pseudoinverse',
             # 'KrauthMezard',
-            # 'DescentBarrier',
-            # 'DescentExpNormOverlap',
+            # 'DescentExpBarrier',
+            # 'DescentExpBarrierSI',
             # 'DescentL1',
             # 'DescentL2',
-            # 'DescentCE',
+            'DescentL2SI'
             # 'Hebb',
-            'Storkey'
+            # 'Storkey'
             # 'DiederichOpperI',
             # 'DiederichOpperII',
-            # 'DescentCE'
-            # 'DescentBarrier',
-            # 'DescentExpNormOverlap']
+            # 'DescentExpBarrier',
+            # 'DescentExpBarrierSI']
             # 'DescentL1',
             # 'DescentL2',
             # 'Gardner'
     ]
     options = [#{'incremental' : False, 'sc' : True },  #Hebbian
-               {'incremental' : False, 'sc': True, 'order': 1},  # Storkey
+               # {'incremental' : False, 'sc': True},  # Storkey
                # {},  #Pseudoinverse
                # {'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
-               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentBarrier
-               # {'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentExpNormOverlap
+               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentExpBarrier
+               # {'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentExpBarrierSI
                # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
                # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
-               # # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentCE
+                {'incremental': False, 'tol': 1e-3}  # DescentL2SI
                # {'incremental': True, 'sc': True},  # Hebbian
-               {'incremental': True, 'sc': True, 'order': 1},  # Storkey
+               # {'incremental': True, 'sc': True},  # Storkey
                # {'lr': 1e-2},  # DOI
                # {'lr': 1e-2, 'tol': 1e-1},  # DOII
-               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentBarrier
-               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5},  # DescentExpNormOverlap
+               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentExpBarrier
+               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5},  # DescentExpBarrierSI
                # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL1
                # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL2
-               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001}  # DescentCE
-               # {'lr': 1e-2, 'k': 1.0, 'max_iter': 100}  # Gardner
+               # {'lr': 1e-2, 'k': 1.0, 'max_iter': 100}  # GardnerKrauthMezard
                ]
     for i, rule in enumerate(rules):
         print(rule)

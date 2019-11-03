@@ -42,6 +42,8 @@ class Hopfield_network():
             self.weights, self.biases = storkey_normalised_lf(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL2':
             self.weights, self.biases = descent_l2(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentL2SI':
+            self.weights, self.biases = descent_l2_si(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentL1':
             self.weights, self.biases = descent_l1(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentCE':
@@ -58,8 +60,8 @@ class Hopfield_network():
             self.weights, self.biases = DiederichOpper_II(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'KrauthMezard':
             self.weights, self.biases = Krauth_Mezard(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'Gardner':
-            self.weights, self.biases = Gardner(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'GardnerKrauthMezard':
+            self.weights, self.biases = Gardner_Krauth_Mezard(self.num_neurons, patterns, self.weights, self.biases, **options)
         else:
             raise ValueError('the specified learning rule is not implemented')
         return None

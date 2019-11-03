@@ -102,6 +102,14 @@ def l2norm_difference_hessian(weights_and_bias, patterns, i, lmbd, alpha):
     H = alpha * np.eye(N + 1) + lmbd**2 * Z_ @ Z_.T
     return H
 
+def l2norm_difference_si(weights_and_bias, patterns, i):
+    Z = np.array(patterns).T
+    p = Z.shape[-1]
+    # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
+    Z_ = np.vstack([Z, np.ones(p)])
+    h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
+    return (1 / 2) * np.sum(((h/(np.sqrt(np.sum(weights_and_bias ** 2)))) - Z[i, :])**2)
+
 ### L1 NORM ###
 
 def l1norm_difference(weights_and_bias, patterns, i, lmbd, alpha):

@@ -63,33 +63,23 @@ def l2_difference_minimisation(N, patterns, weights, biases, sc):
     weights = W.reshape(N, N)
     return weights, biases
 
-def storkey(N, patterns, weights, biases, sc, incremental, order):
+def storkey(N, patterns, weights, biases, sc, incremental):
     '''
     Storkey rule proposed in Storkey,  A.  J.  (1999).
-    Efficient  Covariance  Matrix  Methods for  Bayesian  Gaussian  Processes  and  Hop  eld  Neural  Networks.
+    Efficient  Covariance  Matrix  Methods for  Bayesian  Gaussian  Processes  and  Hopfield  Neural  Networks.
     '''
     if incremental == True:
         for i in range(patterns.shape[0]):
             pattern = deepcopy(patterns[i]).reshape(-1, 1)
             h = weights @ pattern + biases.reshape(-1, 1)
-            if order == 1:
-                Y = (1 / N) * ( (pattern @ pattern.T - np.identity(N)) - h @ pattern.T - pattern @ h.T)
-            elif order == 2:
-                Y = (1 / N) * ((pattern @ pattern.T - np.identity(N)) - h @ pattern.T - pattern @ h.T + h @ h.T)
-            else:
-                raise AttributeError('Order of Storkey rule could be either \'1\' or \'2\'')
+            Y = (1 / N) * ((pattern @ pattern.T - np.identity(N)) - h @ pattern.T - pattern @ h.T + h @ h.T)
             if sc == False:
                 Y[np.arange(N), np.arange(N)] = np.zeros(N)
             weights += Y
     else:
         Z = deepcopy(patterns).T.reshape(N, -1)
         H = (weights @ Z) + np.hstack([biases.reshape(-1, 1) for i in range(Z.shape[-1])])
-        if order == 1:
-            Y = (1 / N) * ( (Z @ Z.T - np.identity(N)) - H @ Z.T - Z @ H.T)
-        elif order == 2:
-            Y = (1 / N) * ((Z @ Z.T - np.identity(N)) - H @ Z.T - Z @ H.T + H @ H.T)
-        else:
-            raise AttributeError('Order of Storkey rule could be either \'1\' or \'2\'')
+        Y = (1 / N) * ((Z @ Z.T - np.identity(N)) - H @ Z.T - Z @ H.T + H @ H.T)
         if sc == False:
             Y[np.arange(N), np.arange(N)] = np.zeros(N)
         weights += Y
@@ -296,6 +286,37 @@ def descent_exp_barrier_si(N, patterns, weights, biases, incremental, tol, lmbd)
             biases[i] = deepcopy(res['x'][-1])
     return weights, biases
 
+def descent_l2_si(N, patterns, weights, biases, incremental, tol):
+    '''
+    Newton's method for minimising \sum_{k = 1}^{p} -(h_i^{\mu} \sigma_i^{\mu}) / (\sum_j w_{ij}^2 + b_i^2)^(0.5)
+    '''
+    jac = egrad(l2norm_difference_si, 0)
+   # hess = jacobian(jac)
+    if incremental:
+        for i in range(N):  # for each neuron independently
+            for j in range(patterns.shape[0]):
+                pattern = np.array(deepcopy(patterns[j].reshape(1, N)))
+                w_i = weights[i, :]
+                b_i = biases[i]
+                x0 = np.append(w_i, b_i)
+                res = minimize(l2norm_difference_si, x0, args=(pattern, i),
+                               jac= jac,# hess = hess,
+                               method='L-BFGS-B', tol=tol, options={'disp': False})
+                weights[i, :] = deepcopy(res['x'][:-1])
+                biases[i] = deepcopy(res['x'][-1])
+    if incremental == False:
+        patterns = np.array(deepcopy(patterns.reshape(-1, N)))
+        for i in range(N):  # for each neuron independently
+            w_i = weights[i, :]
+            b_i = biases[i]
+            x0 = np.append(w_i, b_i)
+            res = minimize(l2norm_difference_si, x0, args=(patterns, i),
+                           jac= jac,# hess = hess,
+                           method='L-BFGS-B', tol=tol, options={'disp': False})
+            weights[i, :] = deepcopy(res['x'][:-1])
+            biases[i] = deepcopy(res['x'][-1])
+    return weights, biases
+
 def DiederichOpper_I(N, patterns, weights, biases, lr):
     '''
     rule I described in Diederich and Opper in (1987) Learning of Correlated Patterns in Spin-Glass Networks by Local Learning Rules
@@ -381,7 +402,7 @@ def Krauth_Mezard(N, patterns, weights, biases, lr, max_iter):
 #                 y = (h_i * pattern[i])/(np.sqrt(sum_of_squares))
 #     return weights, biases
 
-def Gardner(N, patterns, weights, biases, lr, k, max_iter):
+def Gardner_Krauth_Mezard(N, patterns, weights, biases, lr, k, max_iter):
     '''
     Gardner rule rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks +
     Krauth Mezard update strategy
