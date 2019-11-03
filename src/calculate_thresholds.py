@@ -117,10 +117,10 @@ if __name__ == '__main__':
     #             {'lr': 1e-2, 'max_iter' : 200}, #Krauth-Mezard
     #             {'lr': 1e-2}, #DOI
     #             {'lr': 1e-2, 'tol': 1e-1}, #DOII
-    #             {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001}, #DescentExpBarrier
-    #             {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5}, #DescentExpBarrierSI
-    #             {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.001}, #DescentL1
-    #             {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.001}, #DescentL2
+    #             {'sc' : True, 'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001}, #DescentExpBarrier
+    #             {'sc' : True,'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5}, #DescentExpBarrierSI
+    #             {'sc' : True,'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.001}, #DescentL1
+    #             {'sc' : True,'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.001}, #DescentL2
     #             {'lr' :  1e-2, 'k' : 1.0, 'max_iter' : 75} #GardnerKrauthMezard
     #             ]
 
@@ -132,12 +132,28 @@ if __name__ == '__main__':
                {'incremental' : False, 'sc': True},  # Storkey
                {},  #Pseudoinverse
                {'sc' : True, 'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentExpBarrier
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5},  # DescentExpBarrierSI
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
+               {'sc' : True,'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentExpBarrier
+               {'sc' : True,'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5},  # DescentExpBarrierSI
+               {'sc' : True,'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
+               {'sc' : True,'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
                {'sc' : True, 'lr' :  1e-2, 'k' : 1.0, 'max_iter' : 100}  #GardnerKrauthMezard
                ]
+
+    rules_sc_comparison = ['Hebb', 'Storkey', 'DescentL2','GardnerKrauthMezard', 'DescentExpBarrierSI',
+                           'Hebb', 'Storkey', 'DescentL2','GardnerKrauthMezard', 'DescentExpBarrierSI']
+    options_sc_comparison = [
+               {'incremental' : False, 'sc' : True },  #Hebbian
+               {'incremental' : False, 'sc': True},  # Storkey
+               {'sc' : True,'incremental': False, 'tol': 1e-3, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL2
+               {'sc' : True, 'lr' :  1e-2, 'k' : 1.0, 'max_iter' : 100},  #GardnerKrauthMezard
+               {'sc' : True,'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5}, #DescentExpBarrierSI
+               {'incremental' : False, 'sc' : False},  #Hebbian
+               {'incremental' : False, 'sc': False},  # Storkey
+               {'sc': False, 'incremental': False, 'tol': 1e-3, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL2
+               {'sc': False, 'lr': 1e-2, 'k': 1.0, 'max_iter': 100},  # GardnerKrauthMezard
+               {'sc': False, 'incremental': True, 'tol': 1e-1, 'lmbd': 0.5},  # DescentExpBarrierSI
+               ]
+
     # for i in range(len(rules_incremental)):
     #     rule = rules_incremental[i]
     #     arguments = options_incremental[i]

@@ -190,7 +190,7 @@ def descent_l1(N, patterns, weights, biases, sc, incremental, tol, lmbd, alpha):
             biases[i] =  deepcopy(res['x'][-1])
     return weights, biases
 
-def descent_crossentropy(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_crossentropy(N, patterns, weights, biases, sc, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} abs(lmbd h_i^k sigma_i^k - sigma_i^k)
     '''
@@ -203,8 +203,12 @@ def descent_crossentropy(N, patterns, weights, biases, incremental, tol, lmbd, a
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
+                bnds = list(zip(-100 * np.ones(x0.shape[-1]), 100 * np.ones(x0.shape[-1])))
+                if sc == False:
+                    bnds[i] = (0, 0)
                 res = minimize(crossentropy, x0, args=(pattern, i, lmbd, alpha),
                                jac=jac, #hess=hess,
+                               bounds=bnds,
                                method='L-BFGS-B', tol=tol, options={'disp' : False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] =  deepcopy(res['x'][-1])
@@ -214,8 +218,12 @@ def descent_crossentropy(N, patterns, weights, biases, incremental, tol, lmbd, a
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
+            bnds = list(zip(-100*np.ones(x0.shape[-1]), 100*np.ones(x0.shape[-1])))
+            if sc == False:
+                bnds[i] = (0, 0)
             res = minimize(crossentropy, x0, args=(patterns, i, lmbd, alpha),
                            jac=jac,# hess=hess,
+                           bounds=bnds,
                            method='L-BFGS-B', tol=tol, options={'disp' : False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] =  deepcopy(res['x'][-1])
