@@ -46,12 +46,12 @@ class Hopfield_network():
             self.weights, self.biases = descent_l1(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DescentCE':
             self.weights, self.biases = descent_crossentropy(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DescentBarrier':
-            self.weights, self.biases = descent_barrier(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DescentNormalisedOverlap':
-            self.weights, self.biases = descent_normalised_overlap(self.num_neurons, patterns, self.weights, self.biases, **options)
-        elif rule == 'DescentBarrierNormalisedOverlap':
-            self.weights, self.biases = descent_barrier_normalised_overlap(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentExpBarrier':
+            self.weights, self.biases = descent_exp_barrier(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentOverlapSI':
+            self.weights, self.biases = descent_overlap_si(self.num_neurons, patterns, self.weights, self.biases, **options)
+        elif rule == 'DescentExpBarrierSI':
+            self.weights, self.biases = descent_exp_barrier_si(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DiederichOpperI':
             self.weights, self.biases = DiederichOpper_I(self.num_neurons, patterns, self.weights, self.biases, **options)
         elif rule == 'DiederichOpperII':

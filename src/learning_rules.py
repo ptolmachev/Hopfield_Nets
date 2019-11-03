@@ -207,7 +207,7 @@ def descent_crossentropy(N, patterns, weights, biases, incremental, tol, lmbd, a
     return weights, biases
 
 
-def descent_barrier(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_exp_barrier(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} exp{-lambda h_i^k sigma_i^k}
     '''
@@ -218,8 +218,8 @@ def descent_barrier(N, patterns, weights, biases, incremental, tol, lmbd, alpha)
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
-                res = minimize(sum_barriers, x0, args=(pattern, i, lmbd, alpha),
-                               jac=sum_barriers_jacobian, hess=sum_barriers_hessian,
+                res = minimize(sum_exp_barriers, x0, args=(pattern, i, lmbd, alpha),
+                               jac=sum_exp_barriers_jacobian, hess=sum_exp_barriers_hessian,
                                method='Newton-CG', tol=tol, options={'disp': False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] = deepcopy(res['x'][-1])
@@ -229,14 +229,14 @@ def descent_barrier(N, patterns, weights, biases, incremental, tol, lmbd, alpha)
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
-            res = minimize(sum_barriers, x0, args=(patterns, i, lmbd, alpha),
-                           jac=sum_barriers_jacobian, hess=sum_barriers_hessian,
+            res = minimize(sum_exp_barriers, x0, args=(patterns, i, lmbd, alpha),
+                           jac=sum_exp_barriers_jacobian, hess=sum_exp_barriers_hessian,
                            method='Newton-CG', tol=tol, options={'disp': False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] = deepcopy(res['x'][-1])
     return weights, biases
 
-def descent_normalised_overlap(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
+def descent_overlap_si(N, patterns, weights, biases, incremental, tol, lmbd, alpha):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} -(h_i^{\mu} \sigma_i^{\mu}) / (\sum_j w_{ij}^2 + b_i^2)^(0.5)
     '''
@@ -247,8 +247,8 @@ def descent_normalised_overlap(N, patterns, weights, biases, incremental, tol, l
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
-                res = minimize(normalised_overlap, x0, args=(pattern, i, lmbd, alpha),
-                               jac=normalised_overlap_jacobian, hess=normalised_overlap_hessian,
+                res = minimize(overlap_si, x0, args=(pattern, i, lmbd, alpha),
+                               jac=overlap_si_jacobian, hess=overlap_si_hessian,
                                method='Newton-CG', tol=tol, options={'disp': False})
                 weights[i, :] = deepcopy(res['x'][:-1])
                 biases[i] = deepcopy(res['x'][-1])
@@ -258,18 +258,18 @@ def descent_normalised_overlap(N, patterns, weights, biases, incremental, tol, l
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
-            res = minimize(normalised_overlap, x0, args=(patterns, i, lmbd, alpha),
-                           jac=normalised_overlap_jacobian, hess=normalised_overlap_hessian,
+            res = minimize(overlap_si, x0, args=(patterns, i, lmbd, alpha),
+                           jac=overlap_si_jacobian, hess=overlap_si_hessian,
                            method='Newton-CG', tol=tol, options={'disp': False})
             weights[i, :] = deepcopy(res['x'][:-1])
             biases[i] = deepcopy(res['x'][-1])
     return weights, biases
 
-def descent_barrier_normalised_overlap(N, patterns, weights, biases, incremental, tol, lmbd):
+def descent_exp_barrier_si(N, patterns, weights, biases, incremental, tol, lmbd):
     '''
     Newton's method for minimising \sum_{k = 1}^{p} -(h_i^{\mu} \sigma_i^{\mu}) / (\sum_j w_{ij}^2 + b_i^2)^(0.5)
     '''
-    jac = egrad(sum_barriers_normalised_overlap, 0)
+    jac = egrad(sum_exp_barriers_si, 0)
    # hess = jacobian(jac)
     if incremental:
         for i in range(N):  # for each neuron independently
@@ -278,7 +278,7 @@ def descent_barrier_normalised_overlap(N, patterns, weights, biases, incremental
                 w_i = weights[i, :]
                 b_i = biases[i]
                 x0 = np.append(w_i, b_i)
-                res = minimize(sum_barriers_normalised_overlap, x0, args=(pattern, i, lmbd),
+                res = minimize(sum_exp_barriers_si, x0, args=(pattern, i, lmbd),
                                jac= jac,# hess = hess,
                                method='L-BFGS-B', tol=tol, options={'disp': False})
                 weights[i, :] = deepcopy(res['x'][:-1])
@@ -289,7 +289,7 @@ def descent_barrier_normalised_overlap(N, patterns, weights, biases, incremental
             w_i = weights[i, :]
             b_i = biases[i]
             x0 = np.append(w_i, b_i)
-            res = minimize(sum_barriers_normalised_overlap, x0, args=(patterns, i, lmbd),
+            res = minimize(sum_exp_barriers_si, x0, args=(patterns, i, lmbd),
                            jac= jac,# hess = hess,
                            method='L-BFGS-B', tol=tol, options={'disp': False})
             weights[i, :] = deepcopy(res['x'][:-1])

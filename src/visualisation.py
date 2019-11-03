@@ -130,12 +130,12 @@ def flips_and_patterns_3d(file_name):
 
 
 if __name__ == '__main__':
-    rule = 'DescentBarrierNormalisedOverlap'
-    arguments = {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5}#, 'alpha' : 0.01}
+    rule = 'DiederichOpperII'
+    arguments = {'lr': 1e-2, 'tol': 1e-2}
     # arguments = {'sc': True, 'incremental' : True, 'unlearning' : True, 'HN' : True, 'unlearn_rate' : 0.1, 'num_of_retrieval' : 10, 'sync' : True, 'time' : 10}
     # arguments =  {'lmbd' : 0.001}#{'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}
     # arguments = {'gamma' : 100}
-    num_neurons = 50
+    num_neurons = 75
     num_of_patterns = 75
     num_repetitions = 100
     file_name = f'../data/flips_and_patterns_{get_postfix(rule, arguments, num_neurons, num_of_patterns, num_repetitions)}.pkl'

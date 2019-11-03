@@ -2,7 +2,7 @@ import pickle
 import matplotlib
 from copy import deepcopy
 from matplotlib import rc
-rc('text', usetex=True)
+# rc('text', usetex=True)
 # rc('font', family='serif')
 
 from matplotlib import pyplot as plt
@@ -45,7 +45,10 @@ def get_bound(file_name, epsilon):
 
 def generate_comparison_plot(rules, options, incremental):
     fig = plt.figure(figsize=(7,10))
-    colors = ['saddlebrown', 'm', 'g','b', 'g', 'r', 'purple', 'slategray', '#19a2f3','#8a6cb4']
+    if incremental:
+        colors = ['slateblue', 'b', 'g','m', 'olive', 'k', 'purple', 'darkorange', 'darkred','r']
+    else:
+        colors = ['slateblue', 'darkred', 'k', 'm', 'g', 'r', 'purple', 'darkorange', 'b', 'salmon']
     for i, rule in enumerate(rules):
         arguments = options[i]
         file_name = f'../data/flips_and_patterns_{get_postfix(rule, arguments, num_neurons, num_of_patterns, num_repetitions)}.pkl'
@@ -56,18 +59,22 @@ def generate_comparison_plot(rules, options, incremental):
         if rule == 'Pseudoinverse':
             linestyle = '-'
             color = 'k'
-            linewidth = 2
+            linewidth = 1.5
         else:
             linestyle = '-'
             color = colors[i]
-            linewidth = 2
+            linewidth = 1.5
 
         # plt.fill_between(x, y1, y2)
-        y0 = savgol_filter(boundary, 9, 3)
+        y0 = boundary #savgol_filter(boundary, 9, 3)
         n = len(y0)
         x = np.arange(n)
-        y1 = savgol_filter(np.array(boundary) - 0.25*np.array(std_err), 9, 3)
-        y2 = savgol_filter(np.array(boundary) + 0.25*np.array(std_err), 9, 3)
+        y1 = np.array(boundary) - 0.25*np.array(std_err) #savgol_filter(np.array(boundary) - 0.25*np.array(std_err), 9, 3)
+        y2 = np.array(boundary) + 0.25*np.array(std_err) #savgol_filter(np.array(boundary) + 0.25*np.array(std_err), 9, 3)
+
+        y0 = savgol_filter(y0, 9, 3)
+        y1 = savgol_filter(y1, 9, 3)
+        y2 = savgol_filter(y2, 9, 3)
 
         plt.plot(y0, x, color=color,
                  label=rule, linestyle=linestyle, linewidth=linewidth, alpha=0.9)
@@ -77,17 +84,19 @@ def generate_comparison_plot(rules, options, incremental):
         plt.legend(loc='upper right', shadow=True, fontsize='x-large')
         plt.grid(True)
     plt.minorticks_on()
-    plt.ylabel('Number of patterns', fontsize = 20)
-    plt.xlabel('Number of flips in an initial state', fontsize = 20)
+    plt.text(3, 3, 'Overlap > 0.95', fontsize=16)
+    plt.text(17, 30, 'Overlap < 0.95', fontsize=16)
+    plt.ylabel('Number of patterns', fontsize = 16)
+    plt.xlabel('Number of flips in an initial state', fontsize = 16)
     if incremental:
         plt.title('The threshold line for overlap = 0.95 between \n the retrieved and the intended state \n (incremental rules)',
-                  fontsize = 27, y=0.996)
+                  fontsize = 20, y=0.996)
     else:
         plt.title(
             'The threshold line for overlap = 0.95 between \n the retrieved and the intended state \n (non-incremental rules)',
-            fontsize=27, y=0.996)
-    plt.xticks(fontsize = 20)
-    plt.yticks(fontsize=20)
+            fontsize=20, y=0.996)
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
     suffix = 'incremental' if incremental == True else 'non-incremental'
     plt.savefig(f'../imgs/Comparison_{suffix}.png')
     plt.show()
@@ -100,42 +109,41 @@ if __name__ == '__main__':
     num_of_patterns = 75
     num_repetitions = 100
 
-    # rules_incremental = ['Hebbian', 'Storkey', 'KrauthMezard', 'DiederichOpperI', 'DiederichOpperII',
-    #          'DescentBarrier', 'DescentL1', 'DescentL2', 'DescentCE',
-    #          'DescentBarrierNormalisedOverlap', 'Gardner']
-    # options_incremental = [ {'incremental' : True, 'sc' : True }, #Hebbian
-    #             {'incremental': True, 'sc': True, 'order' : 2}, #Storkey
-    #             {'lr': 1e-2, 'max_iter' : 200}, #Krauth-Mezard
-    #             {'lr': 1e-2}, #DOI
-    #             {'lr': 1e-2, 'tol': 1e-2}, #DOII
-    #             {'incremental' : True, 'tol' : 1e-2, 'lmbd' : 0.5, 'alpha' : 0.01}, #DescentBarrier
-    #             {'incremental' : True, 'tol' : 1e-2, 'lmbd' : 0.5, 'alpha' : 0.01}, #DescentL1
-    #             {'incremental' : True, 'tol' : 1e-2, 'lmbd' : 0.5, 'alpha' : 0.01}, #DescentL2
-    #             {'incremental' : True, 'tol' : 1e-2, 'lmbd' : 0.5, 'alpha' : 0.01}, #DescentCE
-    #             {'incremental' : True, 'tol' : 1e-2, 'lmbd' : 0.5}, #DescentNormalisedOverlap
-    #             {'lr' :  1e-2, 'k' : 1.0, 'max_iter' : 200} #Gardner
-    #             ]
+    rules_incremental = ['Hebb', 'Storkey', 'KrauthMezard', 'DiederichOpperI', 'DiederichOpperII',
+             'DescentBarrier', 'DescentBarrierNorm',
+              'DescentL1', 'DescentL2',  'GardnerKrauthMezard'] #'DescentCE' ,
+    options_incremental = [ {'incremental' : True, 'sc' : True }, #Hebbian
+                {'incremental': True, 'sc': True, 'order' : 2}, #Storkey
+                {'lr': 1e-2, 'max_iter' : 200}, #Krauth-Mezard
+                {'lr': 1e-2}, #DOI
+                {'lr': 1e-2, 'tol': 1e-1}, #DOII
+                {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001}, #DescentBarrier
+                {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5}, #DescentNormBarrier
+                {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.001}, #DescentL1
+                {'incremental' : True, 'tol' : 1e-1, 'lmbd' : 0.5, 'alpha' : 0.001}, #DescentL2
+                {'lr' :  1e-2, 'k' : 1.0, 'max_iter' : 75} #GardnerKrauthMezard
+                ]
 
 
     rules_nonincremental = ['Hebb', 'Storkey', 'Pseudoinverse', 'KrauthMezard',
-             'DescentBarrier', 'DescentBarrierNormalisedOverlap', 'DescentL1', 'DescentL2']#, 'DescentCE' ]
-    options_nonincremental = [{'incremental' : False, 'sc' : True },  #Hebbian
+             'DescentBarrier', 'DescentBarrierSI', 'DescentL1', 'DescentL2', 'GardnerKrauthMezard' ]
+    options_nonincremental = [
+               {'incremental' : False, 'sc' : True },  #Hebbian
                {'incremental' : False, 'sc': True, 'order': 2},  # Storkey
                {},  #Pseudoinverse
                {'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
                {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentBarrier
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5},  # DescentNormalisedOverlap
+               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5},  # DescentNormBarrier
                {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentL1
                {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentL2
-               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01}  #DescentCE
+               {'lr' :  1e-2, 'k' : 1.0, 'max_iter' : 100}  #GardnerKrauthMezard
                ]
-
-    # for i in range(len(rules_incremental)):
-    #     rule = rules_incremental[i]
-    #     arguments = options_incremental[i]
-    #     file_name = f'../data/flips_and_patterns_{get_postfix(rule, arguments, num_neurons, num_of_patterns, num_repetitions)}.pkl'
-    #     get_bound(file_name, epsilon)
-    # generate_comparison_plot(rules_incremental, options_incremental, True)
+    for i in range(len(rules_incremental)):
+        rule = rules_incremental[i]
+        arguments = options_incremental[i]
+        file_name = f'../data/flips_and_patterns_{get_postfix(rule, arguments, num_neurons, num_of_patterns, num_repetitions)}.pkl'
+        get_bound(file_name, epsilon)
+    generate_comparison_plot(rules_incremental, options_incremental, True)
 
     for i in range(len(rules_nonincremental)):
         rule = rules_nonincremental[i]

@@ -155,7 +155,7 @@ def crossentropy_hessian(weights_and_bias, patterns, i, lmbd, alpha):
 
 ### EXPONENTIAL BARRIER ###
 
-def sum_barriers(weights_and_bias, patterns, i, lmbd, alpha):
+def sum_exp_barriers(weights_and_bias, patterns, i, lmbd, alpha):
     Z = np.array(patterns).T
     p = Z.shape[-1]
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
@@ -163,7 +163,7 @@ def sum_barriers(weights_and_bias, patterns, i, lmbd, alpha):
     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
     return np.sum(np.exp(-lmbd * Z[i, :] * h))  + (alpha / 2) * np.sum(weights_and_bias ** 2)
 
-def sum_barriers_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
+def sum_exp_barriers_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
     Z = np.array(patterns).T
     p = Z.shape[-1]
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
@@ -172,7 +172,7 @@ def sum_barriers_jacobian(weights_and_bias, patterns, i, lmbd, alpha):
     grad_w_b = -(lmbd * Z[i, :] * np.exp(-lmbd * Z[i, :] * h)) @ Z_.T + alpha * weights_and_bias
     return grad_w_b
 
-def sum_barriers_hessian(weights_and_bias, patterns, i, lmbd, alpha):
+def sum_exp_barriers_hessian(weights_and_bias, patterns, i, lmbd, alpha):
     Z = np.array(patterns).T
     p = Z.shape[-1]
     N = Z.shape[0]
@@ -182,9 +182,9 @@ def sum_barriers_hessian(weights_and_bias, patterns, i, lmbd, alpha):
     H = alpha * np.eye(N + 1) + (lmbd**2 * np.exp(-lmbd * Z[i, :] * h_i)) * Z_ @ Z_.T
     return H
 
-### NORMALISED OVERLAP ###
+### OVERLAP Scale Invariant ###
 
-def normalised_overlap(weights_and_bias, patterns, i, lmbd):
+def overlap_si(weights_and_bias, patterns, i, lmbd):
     Z = np.array(patterns).T
     p = Z.shape[-1]
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
@@ -192,7 +192,7 @@ def normalised_overlap(weights_and_bias, patterns, i, lmbd):
     h = (weights_and_bias.reshape(1, -1) @ Z_).squeeze() # vector of length p
     return -np.sum((lmbd * h * Z[i, :])) / np.sqrt(np.sum(weights_and_bias ** 2))
 
-def normalised_overlap_jacobian(weights_and_bias, patterns, i, lmbd):
+def overlap_si_jacobian(weights_and_bias, patterns, i, lmbd):
     Z = np.array(patterns).T
     p = Z.shape[-1]
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1
@@ -203,7 +203,7 @@ def normalised_overlap_jacobian(weights_and_bias, patterns, i, lmbd):
     grad_w_b = term1 + term2
     return grad_w_b
 
-def normalised_overlap_hessian(weights_and_bias, patterns, i, lmbd):
+def overlap_si_hessian(weights_and_bias, patterns, i, lmbd):
     Z = np.array(patterns).T
     N = Z.shape[0]
     p = Z.shape[-1]
@@ -217,7 +217,7 @@ def normalised_overlap_hessian(weights_and_bias, patterns, i, lmbd):
 
 ### sum of exponents of normalised overlaps ###
 
-def sum_barriers_normalised_overlap(weights_and_bias, patterns, i, lmbd):
+def sum_exp_barriers_si(weights_and_bias, patterns, i, lmbd):
     Z = np.array(patterns).T
     p = Z.shape[-1]
     # we want to treat the biases as if they are weight from the neurons outside of the network in the state +1

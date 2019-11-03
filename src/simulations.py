@@ -5,6 +5,11 @@ from utils import *
 from matplotlib import pyplot as plt
 from copy import deepcopy
 from visualisation import flips_and_patterns_contour_plot
+import sys
+import warnings
+
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")
 
 def flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitions, params, plot = False):
     rule = params['rule']
@@ -68,30 +73,45 @@ if __name__ == '__main__':
     num_repetitions = 100
 
 
-    rules = ['Hebb', 'Storkey', 'Pseudoinverse', 'KrauthMezard',
-             'DescentBarrier', 'DescentBarrierNormalisedOverlap', 'DescentL1', 'DescentL2', #'DescentCE',
-             'Hebb', 'Storkey', 'DiederichOpperI', 'DiederichOpperII',
-              'DescentBarrier', 'DescentL1', 'DescentL2', #'DescentCE',
-              'DescentBarrierNormalisedOverlap', 'Gardner']
-    options = [{'incremental' : False, 'sc' : True },  #Hebbian
-               {'incremental' : False, 'sc': True, 'order': 2},  # Storkey
-               {},  #Pseudoinverse
-               {'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentBarrier
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentNormalisedOverlap
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentL1
-               {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentL2
-               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.01},  #DescentCE
-               {'incremental': True, 'sc': True},  # Hebbian
-               {'incremental': True, 'sc': True, 'order': 2},  # Storkey
-               {'lr': 1e-2},  # DOI
-               {'lr': 1e-2, 'tol': 1e-2},  # DOII
-               {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5, 'alpha': 0.01},  # DescentBarrier
-               {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5},  # DescentNormalisedOverlap
-               {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5, 'alpha': 0.01},  # DescentL1
-               {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5, 'alpha': 0.01},  # DescentL2
-               # {'incremental': True, 'tol': 1e-2, 'lmbd': 0.5, 'alpha': 0.01},  # DescentCE
-               {'lr': 1e-2, 'k': 1.0, 'max_iter': 200}  # Gardner
+    rules = [#'Hebb',
+            'Storkey',
+            # 'Pseudoinverse',
+            # 'KrauthMezard',
+            # 'DescentBarrier',
+            # 'DescentExpNormOverlap',
+            # 'DescentL1',
+            # 'DescentL2',
+            # 'DescentCE',
+            # 'Hebb',
+            'Storkey'
+            # 'DiederichOpperI',
+            # 'DiederichOpperII',
+            # 'DescentCE'
+            # 'DescentBarrier',
+            # 'DescentExpNormOverlap']
+            # 'DescentL1',
+            # 'DescentL2',
+            # 'Gardner'
+    ]
+    options = [#{'incremental' : False, 'sc' : True },  #Hebbian
+               {'incremental' : False, 'sc': True, 'order': 1},  # Storkey
+               # {},  #Pseudoinverse
+               # {'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
+               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentBarrier
+               # {'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentExpNormOverlap
+               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
+               # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
+               # # {'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentCE
+               # {'incremental': True, 'sc': True},  # Hebbian
+               {'incremental': True, 'sc': True, 'order': 1},  # Storkey
+               # {'lr': 1e-2},  # DOI
+               # {'lr': 1e-2, 'tol': 1e-1},  # DOII
+               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentBarrier
+               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5},  # DescentExpNormOverlap
+               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL1
+               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL2
+               # {'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001}  # DescentCE
+               # {'lr': 1e-2, 'k': 1.0, 'max_iter': 100}  # Gardner
                ]
     for i, rule in enumerate(rules):
         print(rule)
