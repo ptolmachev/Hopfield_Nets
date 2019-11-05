@@ -3,9 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="ec45b697-f000-44d6-ab12-6303a128ad24" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Hopfield_Network.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield_Network.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/calculate_thresholds.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/calculate_thresholds.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/learning_rules.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/learning_rules.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/visualisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/visualisation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulations.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,7 +48,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.visualisation">
+  <component name="RunManager" selected="Python.calculate_thresholds">
     <configuration name="Hopfield_net" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Hopfield_Nets" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -155,10 +156,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.calculate_thresholds" />
+        <item itemvalue="Python.simulations" />
         <item itemvalue="Python.visualisation" />
         <item itemvalue="Python.Hopfield_net" />
-        <item itemvalue="Python.simulations" />
-        <item itemvalue="Python.calculate_thresholds" />
         <item itemvalue="Python.learning_rules" />
       </list>
     </recent_temporary>

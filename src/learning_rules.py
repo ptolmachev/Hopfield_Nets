@@ -386,7 +386,7 @@ def DiederichOpper_II(N, patterns, weights, biases, sc, lr, tol):
     return weights, biases
 
 
-def Krauth_Mezard(N, patterns, weights, biases, sc, lr, max_iter):
+def Krauth_Mezard(N, patterns, weights, biases, sc, lr, maxiter):
     '''
     Krauth-Mezard rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks
     '''
@@ -394,7 +394,7 @@ def Krauth_Mezard(N, patterns, weights, biases, sc, lr, max_iter):
     M = 0
     lf_alignment_global = (weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])) * Z
     # lf_alignment_global: if any of these numbers are below zero, some of the patterns is not stable
-    while (np.any(lf_alignment_global < 0) and (M <= max_iter)):
+    while (np.any(lf_alignment_global < 0) and (M <= maxiter)):
         for i in range(N):  # for each neuron independently
             # compute local field alignment (h, sigma)
             lf_alignment = deepcopy((weights[i, :] @ Z + biases[i]) * Z[i, :])
@@ -413,7 +413,7 @@ def Krauth_Mezard(N, patterns, weights, biases, sc, lr, max_iter):
                 h_i = (weights[i, :] @ weakest_pattern.T + biases[i])
         lf_alignment_global = (weights @ Z + np.hstack([biases.reshape(N, 1)] * Z.shape[-1])) * Z
         M += 1
-        if M >= max_iter:
+        if M >= maxiter:
             print('Maximum number of iterations has been exceeded')
 
     #rescale weights and biases:
@@ -443,7 +443,7 @@ def Gardner(N, patterns, weights, biases, sc, lr, k):
                 y = (h_i * pattern[i])/(np.sqrt(sum_of_squares))
     return weights, biases
 
-def Gardner_Krauth_Mezard(N, patterns, weights, biases, sc, lr, k, max_iter):
+def Gardner_Krauth_Mezard(N, patterns, weights, biases, sc, lr, k, maxiter):
     '''
     Gardner rule rule proposed in (1987) Krauth Learning algorithms with optimal stability in neural networks +
     Krauth Mezard update strategy
@@ -454,7 +454,7 @@ def Gardner_Krauth_Mezard(N, patterns, weights, biases, sc, lr, k, max_iter):
     Z_ = np.vstack([Z, np.ones(p)])
     w_and_b = deepcopy(np.hstack([weights, biases.reshape(N, 1)]))
     y_global = ( (w_and_b @ Z_).T/ (np.sqrt(np.sum(w_and_b ** 2, axis=1))) )* Z.T #
-    while (np.any(y_global < k) and M < max_iter):
+    while (np.any(y_global < k) and M < maxiter):
         for i in range(N):  # for each neuron independently
             # compute normalised stability measure (h_i, sigma_i)/|w_i|^2_2
             sum_of_squares = np.sum(weights[i, :] ** 2 + biases[i]**2)
@@ -477,7 +477,7 @@ def Gardner_Krauth_Mezard(N, patterns, weights, biases, sc, lr, k, max_iter):
         w_and_b = deepcopy(np.hstack([weights, biases.reshape(N, 1)]))
         y_global = ( (w_and_b @ Z_).T/ (np.sqrt(np.sum(w_and_b ** 2, axis=1))) )* Z.T #
         M += 1
-        if M >= max_iter:
+        if M >= maxiter:
             print('Maximum number of iterations has been exceeded')
     return weights, biases
 

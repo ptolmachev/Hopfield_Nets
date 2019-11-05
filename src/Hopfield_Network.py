@@ -105,13 +105,13 @@ if __name__ == '__main__':
     # options = {'sc' : True, 'lr': 1e-1, 'k' : 1.0}
 
     # rule = 'GardnerKrauthMezard'
-    # options = {'sc' : True, 'lr': 1e-2, 'k' : 1.0, 'max_iter' : 150}
+    # options = {'sc' : True, 'lr': 1e-2, 'k' : 1.0, 'maxiter' : 150}
 
     # rule = 'Gardner'
-    # options = {'lmbd': 1e-2, 'k' : 1.0, 'max_iter' : 200}
+    # options = {'lmbd': 1e-2, 'k' : 1.0, 'maxiter' : 200}
     #
     # rule = 'KrauthMezard'
-    # options = {'sc' : False, 'lr': 1e-2,  'max_iter' : 100}
+    # options = {'sc' : False, 'lr': 1e-2,  'maxiter' : 100}
 
     # rule = 'DiederichOpperI'
     # options = {'sc' : False, 'lr': 0.01}
@@ -161,6 +161,4 @@ if __name__ == '__main__':
     similarities = np.array([[np.dot(data['state'][:,j],patterns[i])/num_neurons for i in range(len(patterns))] for j in range(time)])
     plt.plot(similarities)
     plt.show()
-    # print('\nSimilarity of signs with different patterns (after): ')
-    # for i in range(len(patterns)):
-    #     print(np.linalg.norm(np.sign(retrieved_pattern) - patterns[i], 2))
+

@@ -98,20 +98,20 @@ if __name__ == '__main__':
             # for sc effects
             # 'Hebb',
             # 'Storkey',
-            # 'Pseudoinverse',
+            # 'DescentL2',
+             'DescentL1',
             # 'GardnerKrauthMezard',
-            # 'DescentExpBarrierSI',
-
+            # 'DescentExpBarrierSI'
     ]
     options = [# Non-incremental
                #{'incremental' : False, 'sc' : True },  #Hebbian
                # {'incremental' : False, 'sc': True},  # Storkey
                # {},  #Pseudoinverse
-               # {'sc' : False, 'lr': 1e-2, 'max_iter': 200},  # Krauth-Mezard
-               {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentExpBarrier
-               {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentExpBarrierSI
-               {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
-               {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}  #DescentL2
+               # {'sc' : False, 'lr': 1e-2, 'maxiter': 200},  # Krauth-Mezard
+               # {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentExpBarrier
+               # {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd': 0.5},  # DescentExpBarrierSI
+               # {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
+               # {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001}  #DescentL2
                 # incremental
                # {'incremental': True, 'sc': True},  # Hebbian
                # {'incremental': True, 'sc': True},  # Storkey
@@ -121,13 +121,14 @@ if __name__ == '__main__':
                # {'sc' : False, 'incremental': True, 'tol': 1e-1, 'lmbd': 0.5},  # DescentExpBarrierSI
                # {'sc' : False, 'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL1
                # {'sc' : False, 'incremental': True, 'tol': 1e-1, 'lmbd': 0.5, 'alpha': 0.001},  # DescentL2
-               # {'sc' : True, 'lr': 1e-2, 'k': 1.0, 'max_iter': 100}  # GardnerKrauthMezard
+               # {'sc' : True, 'lr' :  1e-2, 'k' : 1.0, 'maxiter' : 100}  # GardnerKrauthMezard
 
                 # effects of self connectivity
-                # {'incremental' : False, 'sc' : True },  #Hebbian
-                # {'incremental' : False, 'sc': True},  # Storkey
-                # {},  #Pseudoinverse
-                # {'sc': True, 'lr': 1e-2, 'k': 1.0, 'max_iter': 100},  # GardnerKrauthMezard
+                # {'incremental' : False, 'sc' : False },  #Hebbian
+                # {'incremental' : False, 'sc': False },  # Storkey
+                # {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
+                 {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
+                # {'sc' : False, 'lr': 1e-2, 'k': 1.0, 'maxiter': 100},  # GardnerKrauthMezard
                 # {'sc' : False, 'incremental': False, 'tol': 1e-3, 'lmbd': 0.5},  # DescentExpBarrierSI #add bonds
                ]
     for i, rule in enumerate(rules):
