@@ -4,9 +4,6 @@
     <list default="true" id="ec45b697-f000-44d6-ab12-6303a128ad24" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Hopfield_Network.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield_Network.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/calculate_thresholds.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/calculate_thresholds.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/learning_rules.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/learning_rules.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/simulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulations.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,7 +26,7 @@
   </component>
   <component name="ProjectId" id="1QJCHKWfOk1AI5aXrRUkbywL5Ev" />
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../rCPG_swCPG" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
