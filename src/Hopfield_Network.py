@@ -30,6 +30,13 @@ class Hopfield_network():
         return None
 
     def learn_patterns(self, patterns, rule, options):
+        '''
+        Update weights according to a specified learning rule and learning options
+        The implemented rules are:
+        Hebb, Pseudoinverse, Storkey, StorkeyNormalisedLF, DescentL2, DescentL1,
+        DescentCE, DescentExpBarrier, DescentExpBarrierSI, DescentOverlapSI, DiederichOpperI, DiederichOpperII,
+        KrauthMezard, GardnerKrauthMezard, Gardner
+        '''
         patterns = deepcopy(np.array(patterns).reshape(-1, len(patterns[0])))
         if rule == 'Hebb':
             self.weights, self.biases = hebbian_lr(self.num_neurons, patterns, self.weights, self.biases,  **options)
