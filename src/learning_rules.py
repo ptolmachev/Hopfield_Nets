@@ -7,7 +7,6 @@ from scipy.optimize import minimize
 from utils import normalise_weights
 from scipy.sparse.linalg import lsqr
 from math_utils import *
-#utils
 
 def hebbian_lr(N, patterns, weights, biases, sc, incremental):
     '''

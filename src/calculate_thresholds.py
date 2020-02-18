@@ -1,3 +1,4 @@
+# comparison plot generation functions
 import pickle
 import matplotlib
 from copy import deepcopy

@@ -12,6 +12,15 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
 def flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitions, params, plot = False):
+    '''
+    :param num_neurons:
+    :param num_of_flips:
+    :param num_of_patterns:
+    :param num_repetitions:
+    :param params:
+    :param plot:
+    :return:
+    '''
     rule = params['rule']
     learning_options = params['learning_options']
     retrieval_options = params['retrieval_options']
@@ -67,6 +76,7 @@ def weights_distribution_plot(num_neurons, num_of_patterns, params):
     return None
 
 if __name__ == '__main__':
+    # run simulations
     num_neurons = 75
     num_of_flips = 37
     num_of_patterns = 75
@@ -98,8 +108,8 @@ if __name__ == '__main__':
             # for sc effects
             # 'Hebb',
             # 'Storkey',
-            # 'DescentL2',
-             'DescentL1',
+            'DescentL2',
+            'DescentL1',
             # 'GardnerKrauthMezard',
             # 'DescentExpBarrierSI'
     ]
@@ -126,7 +136,7 @@ if __name__ == '__main__':
                 # effects of self connectivity
                 # {'incremental' : False, 'sc' : False },  #Hebbian
                 # {'incremental' : False, 'sc': False },  # Storkey
-                # {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
+                {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL2
                  {'sc' : False, 'incremental' : False, 'tol' : 1e-3, 'lmbd' : 0.5, 'alpha' : 0.001},  #DescentL1
                 # {'sc' : False, 'lr': 1e-2, 'k': 1.0, 'maxiter': 100},  # GardnerKrauthMezard
                 # {'sc' : False, 'incremental': False, 'tol': 1e-3, 'lmbd': 0.5},  # DescentExpBarrierSI #add bonds
@@ -139,6 +149,7 @@ if __name__ == '__main__':
         params['learning_options'] = options[i]
         params['retrieval_options'] = {'time_of_retrieval' : 50, 'sync' : True}
         flips_and_patterns(num_neurons, num_of_flips, num_of_patterns, num_repetitions, params)
+
     # for i in range(1,150):
     #     print(i)
     #     weights_distribution_plot(100, i, params)

@@ -3,9 +3,16 @@
   <component name="ChangeListManager">
     <list default="true" id="ec45b697-f000-44d6-ab12-6303a128ad24" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.ipynb_checkpoints/Hopfield networks tutorial-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/.ipynb_checkpoints/Hopfield networks tutorial-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Hopfield networks tutorial.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield networks tutorial.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Hopfield_Network.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Hopfield_Network.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/calculate_thresholds.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/calculate_thresholds.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/learning_rules.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/learning_rules.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/math_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/math_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/visualisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/visualisation.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,6 +32,11 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1QJCHKWfOk1AI5aXrRUkbywL5Ev" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../rCPG_swCPG" />
   </component>
@@ -33,19 +45,7 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager" selected="Python.calculate_thresholds">
+  <component name="RunManager" selected="Python.simulations">
     <configuration name="Hopfield_net" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Hopfield_Nets" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -153,10 +153,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.calculate_thresholds" />
         <item itemvalue="Python.simulations" />
         <item itemvalue="Python.visualisation" />
         <item itemvalue="Python.Hopfield_net" />
+        <item itemvalue="Python.calculate_thresholds" />
         <item itemvalue="Python.learning_rules" />
       </list>
     </recent_temporary>
@@ -187,6 +187,24 @@
       </map>
     </option>
   </component>
+  <component name="WindowStateProjectService">
+    <state width="1827" height="274" key="GridCell.Tab.0.bottom" timestamp="1582023219074">
+      <screen x="70" y="27" width="1850" height="1053" />
+    </state>
+    <state width="1827" height="274" key="GridCell.Tab.0.bottom/70.27.1850.1053@70.27.1850.1053" timestamp="1582023219074" />
+    <state width="1827" height="274" key="GridCell.Tab.0.center" timestamp="1582023219072">
+      <screen x="70" y="27" width="1850" height="1053" />
+    </state>
+    <state width="1827" height="274" key="GridCell.Tab.0.center/70.27.1850.1053@70.27.1850.1053" timestamp="1582023219072" />
+    <state width="1827" height="274" key="GridCell.Tab.0.left" timestamp="1582023219071">
+      <screen x="70" y="27" width="1850" height="1053" />
+    </state>
+    <state width="1827" height="274" key="GridCell.Tab.0.left/70.27.1850.1053@70.27.1850.1053" timestamp="1582023219071" />
+    <state width="1827" height="274" key="GridCell.Tab.0.right" timestamp="1582023219073">
+      <screen x="70" y="27" width="1850" height="1053" />
+    </state>
+    <state width="1827" height="274" key="GridCell.Tab.0.right/70.27.1850.1053@70.27.1850.1053" timestamp="1582023219073" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -207,17 +225,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/visualisation.py</url>
-          <line>20</line>
+          <line>21</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/visualisation.py</url>
-          <line>54</line>
+          <line>55</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/visualisation.py</url>
-          <line>42</line>
+          <line>43</line>
           <option name="timeStamp" value="73" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -226,7 +244,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/math_utils.py</url>
-          <line>71</line>
+          <line>70</line>
           <option name="timeStamp" value="196" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -236,37 +254,37 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/math_utils.py</url>
-          <line>84</line>
+          <line>83</line>
           <option name="timeStamp" value="201" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/math_utils.py</url>
-          <line>153</line>
+          <line>152</line>
           <option name="timeStamp" value="202" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/learning_rules.py</url>
-          <line>434</line>
+          <line>433</line>
           <option name="timeStamp" value="222" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/learning_rules.py</url>
-          <line>481</line>
+          <line>480</line>
           <option name="timeStamp" value="231" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/learning_rules.py</url>
-          <line>450</line>
+          <line>449</line>
           <option name="timeStamp" value="232" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/math_utils.py</url>
-          <line>214</line>
+          <line>213</line>
           <option name="timeStamp" value="233" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/learning_rules.py</url>
-          <line>310</line>
+          <line>309</line>
           <option name="timeStamp" value="238" />
         </line-breakpoint>
       </breakpoints>
